@@ -1,0 +1,37 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Planting {
+  treeId           String   @db.VarChar(255)
+  ownerId          String   @db.VarChar(50)
+  latitude         Decimal? @db.Decimal(10, 8)
+  longitude        Decimal? @db.Decimal(11, 8)
+  treeUrl          String   @db.VarChar(255)
+  plantedAt        DateTime @default(now()) @db.Timestamp(0)
+  validationStatus Boolean? @default(dbgenerated("b'0'")) @db.Bit(1)
+  Tree             Tree     @relation(fields: [treeId], references: [treeId], onDelete: NoAction, onUpdate: NoAction, map: "Planting_ibfk_1")
+  User             User     @relation(fields: [ownerId], references: [walletAddress], onDelete: NoAction, onUpdate: NoAction, map: "Planting_ibfk_2")
+
+  @@id([treeId, ownerId, plantedAt])
+  @@index([ownerId], map: "ownerId")
+}
+
+model Tree {
+  treeId   String     @id @db.VarChar(255)
+  type     String?    @db.VarChar(255)
+  value    Float?     @db.Float
+  Planting Planting[]
+}
+
+model User {
+  walletAddress String     @id @db.VarChar(50)
+  name          String?    @db.VarChar(255)
+  email         String?    @db.VarChar(255)
+  Planting      Planting[]
+}
