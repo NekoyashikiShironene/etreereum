@@ -48,6 +48,8 @@ export default async function Home() {
                 <Image
                   src={`/trees/${tree.treeId}.jpg`}
                   alt={tree.type ?? 'default tree'}
+                  width={100}
+                  height={100}
                   className="w-full h-24 object-cover rounded-md mb-2"
                 />
               }
