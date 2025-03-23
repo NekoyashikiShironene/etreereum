@@ -6,7 +6,11 @@ import TransactionList from "@/components/TransactionList";
 import RedeemItem from "@/components/RedeemItem";
 import NFTCard from "@/components/NFTCard";
 
+
+import WalletButton from "@/components/WalletButton";
+
 export default function Page() {
+
   return (
     <div className="min-h-screen bg-gray-50 text-gray-800">
       {/* Navigation Bar */}
@@ -29,6 +33,7 @@ export default function Page() {
           <a href="#" className="text-gray-600 hover:text-green-600"></a>
           <a href="#" className="text-gray-600 hover:text-green-600"></a>
         </div>
+        <WalletButton />
       </nav>
 
       <div className="p-6 sm:p-10 grid gap-10">
