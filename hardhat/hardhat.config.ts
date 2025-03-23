@@ -1,8 +1,9 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
+import path from 'path';
+import dotenv from 'dotenv';
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-require('dotenv').config({path:__dirname+'../.env'})
+dotenv.config({path: path.join(__dirname, '/../.env')});
 
 const config: HardhatUserConfig = {
   solidity: "0.8.28",
