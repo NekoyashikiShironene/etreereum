@@ -9,7 +9,7 @@ contract TreeCoin is ERC20, Ownable, AccessControl {
     bytes32 public constant MINTER = keccak256("MINTER");
     bytes32 public constant ADMIN = keccak256("ADMIN");
 
-    event newTransaction(address indexed sender, address recipient, uint256 amount);
+    event newTransaction(address sender, address recipient, uint256 amount);
 
     constructor(address owner) ERC20("Etreereum", "ETR") Ownable(owner) {
         _mint(owner, 10000000 * 10 ** 18);
