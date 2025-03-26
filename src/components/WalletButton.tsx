@@ -5,6 +5,6 @@ export default function WalletButton() {
     const { accountAddress, connectWallet } = useWallet();
 
     return (
-        <button onClick={() => connectWallet()}>{accountAddress ?? 'WalletConnect'}</button>
+        <button onClick={() => connectWallet()} className='cursor-pointer'>{accountAddress ?? 'Connect Wallet'}</button>
     )
 }
