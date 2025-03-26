@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.0;
+pragma solidity >=0.8.20;
 
 import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
@@ -9,7 +9,7 @@ contract NFTree is ERC721, Ownable, AccessControl  {
     uint256 private _nextTokenId;
     bytes32 public constant ADMIN = keccak256("ADMIN");
 
-    event newTree(address user, uint256 plantedAt, string metadataURI, int24 latitude, int24 longitude);
+    event NewTree(address user, uint256 plantedAt, string metadataURI, int24 latitude, int24 longitude);
 
     struct Coordinates {
         int24 latitude;
@@ -47,7 +47,7 @@ contract NFTree is ERC721, Ownable, AccessControl  {
         _nextTokenId++;
         userOwnedTree[user].push(_nextTokenId);
         
-        emit newTree(user, plantedAt, metadataURI, latitude, longitude);
+        emit NewTree(user, plantedAt, metadataURI, latitude, longitude);
     }
 
     function getOwner(uint256 tokenId) public view returns(address) {
