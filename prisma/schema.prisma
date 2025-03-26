@@ -8,22 +8,23 @@ datasource db {
 }
 
 model Planting {
-  treeId           String   @db.VarChar(255)
-  ownerId          String   @db.VarChar(50)
-  latitude         Decimal? @db.Decimal(10, 8)
-  longitude        Decimal? @db.Decimal(11, 8)
-  treeUrl          String   @db.VarChar(255)
-  plantedAt        DateTime @default(now()) @db.Timestamp(0)
-  validationStatus Boolean? @default(dbgenerated("b'0'")) @db.Bit(1)
-  Tree             Tree     @relation(fields: [treeId], references: [treeId], onDelete: NoAction, onUpdate: NoAction, map: "Planting_ibfk_1")
-  User             User     @relation(fields: [ownerId], references: [walletAddress], onDelete: NoAction, onUpdate: NoAction, map: "Planting_ibfk_2")
+  treeId           Int       @id @default(autoincrement())
+  typeId           Int?
+  ownerAddress     String?   @db.VarChar(50)
+  latitude         Decimal?  @db.Decimal(10, 8)
+  longitude        Decimal?  @db.Decimal(11, 8)
+  treeImageUrl     String    @db.VarChar(255)
+  plantedAt        DateTime? @default(now()) @db.Timestamp(0)
+  validationStatus Boolean?  @default(dbgenerated("b'0'")) @db.Bit(1)
+  Tree             Tree?     @relation(fields: [typeId], references: [typeId], onDelete: NoAction, onUpdate: NoAction, map: "Planting_ibfk_1")
+  User             User?     @relation(fields: [ownerAddress], references: [walletAddress], onDelete: NoAction, onUpdate: NoAction, map: "Planting_ibfk_2")
 
-  @@id([treeId, ownerId, plantedAt])
-  @@index([ownerId], map: "ownerId")
+  @@index([ownerAddress], map: "ownerAddress")
+  @@index([typeId], map: "typeId")
 }
 
 model Tree {
-  treeId   String     @id @db.VarChar(255)
+  typeId   Int        @id @default(autoincrement())
   type     String?    @db.VarChar(255)
   value    Float?     @db.Float
   Planting Planting[]
