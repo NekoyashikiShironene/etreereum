@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 dotenv.config({path: path.join(__dirname, '/../.env')});
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.28",
+  solidity: "0.8.20",
   defaultNetwork: "etreereum_network",
   networks: {
     hardhat: {},
