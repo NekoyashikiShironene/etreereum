@@ -1,18 +1,34 @@
 import { parseUnits } from "ethers";
-
 import { useContract } from "@/contexts/ContractContext";
 
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useState } from "react";
 
 export default function TokenBalance() {
-  const { treeCoinContract, balance } = useContract();
-  const handleTransfer = async () => {
-    if (!treeCoinContract) return;
+  const { etreereumContract } = useContract();
+  const { instance: etreereum, balance } = etreereumContract;
 
-    const address = prompt("Enter address");
-    const amount = prompt("Enter amount");
+  const [address, setAddress] = useState<string>("");
+  const [amount, setAmount] = useState<string>("");
+
+  const handleTransfer = async () => {
+    if (!etreereum) return;
 
     try {
-      const tx = await treeCoinContract.transfer(address, parseUnits((amount ?? 0).toString(), "ether"));
+      const tx = await etreereum.transfer(address, parseUnits((amount ?? 0).toString(), "ether"));
     } catch (e: unknown) {
       alert("Failed: " + e);
     }
@@ -28,6 +44,50 @@ export default function TokenBalance() {
         <button className="bg-green-600 text-white px-4 py-1 rounded hover:bg-green-700">
           + Add Tokens
         </button>
+
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline">Transfer</Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Transfer ETR</DialogTitle>
+              <DialogDescription>
+                Send ETR to another account
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="name" className="text-right">
+                  Address
+                </Label>
+                <Input
+                  id="address"
+                  className="col-span-3"
+                  placeholder="0x..."
+                  onChange={(e) => setAddress(e.target.value)}
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="username" className="text-right">
+                  Amount
+                </Label>
+                <Input
+                  id="amount"
+                  defaultValue="5"
+                  className="col-span-3"
+                  onChange={(e) => setAmount(e.target.value)}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button onClick={() => handleTransfer()} >Transfer</Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         <button onClick={() => handleTransfer()} className="border px-4 py-1 rounded">↔ Transfer</button>
       </div>
     </div>
