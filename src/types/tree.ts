@@ -5,6 +5,12 @@ export type PlantingTree = {
     latitude: number,
     longitude: number,
     treeImageUrl: string,
-    plantedAt: Date,
+    plantedAt: string,
     validationStatus: boolean
+}
+
+export type TTreeType = {
+    typeId: number,
+    type: string,
+    value: number
 }
