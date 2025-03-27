@@ -60,3 +60,6 @@ hardhat/coverage.json
 hardhat/ignition/deployments
 
 todolist.txt
+
+
+public/uploads/*
