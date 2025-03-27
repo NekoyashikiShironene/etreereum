@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import WalletProvider from "@/contexts/WalletContext";
 import { ContractProvider } from "@/contexts/ContractContext";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,6 +36,7 @@ export default function RootLayout({
           <ContractProvider>
             <Navbar />
             <main className="p-6 sm:p-10">{children}</main>
+            <Toaster />
           </ContractProvider>
         </WalletProvider>
       </body>
