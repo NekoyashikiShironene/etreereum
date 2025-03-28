@@ -10,16 +10,16 @@ contract NFTree is ERC721, AccessControl  {
     bytes32 public constant ADMIN = keccak256("ADMIN");
     address private _owner;
 
-    event MintTree(address owner, uint256 plantedAt, string metadataURI, int24 latitude, int24 longitude);
-    event BurnTree(address owner, uint256 tokenId, int24 latitude, int24 longitude);
+    event MintTree(address owner, uint256 plantedAt, string metadataURI, int32 latitude, int32 longitude);
+    event BurnTree(address owner, uint256 tokenId, int32 latitude, int32 longitude);
     event ChangeOwner(address oldOwner, address newOwner);
 
     struct Coordinates {
-        int24 latitude;
-        int24 longitude;
+        int32 latitude;
+        int32 longitude;
     }
     
-    struct Tree {
+    struct Tree { 
         uint256 tokenId;
         uint256 plantedAt;
         string metadataURI;
@@ -75,7 +75,18 @@ contract NFTree is ERC721, AccessControl  {
 
         for (uint256 i=0; i<tokens.length; i++)
             trees[i] = treeData[tokens[i]];
+            
 
+        return trees;
+    }
+
+
+    function getAllTrees() public onlyRole(ADMIN) view returns(Tree[] memory) {
+        Tree[] memory trees = new Tree[](_nextTokenId);
+
+        for (uint256 i=0; i<_nextTokenId; i++)
+            trees[i] = treeData[i];
+            
         return trees;
     }
 
@@ -103,20 +114,20 @@ contract NFTree is ERC721, AccessControl  {
         address user,
         uint256 plantedAt,
         string memory metadataURI,
-        int24 latitude,
-        int24 longitude
+        int32 latitude,
+        int32 longitude
     )  public onlyRole(ADMIN) {
         treeData[_nextTokenId] = Tree(_nextTokenId, plantedAt, metadataURI, Coordinates(latitude, longitude));
         _safeMint(user, _nextTokenId);
-        _nextTokenId++;
         userOwnedTree[user].push(_nextTokenId);
+        _nextTokenId++;
         emit MintTree(user, plantedAt, metadataURI, latitude, longitude);
     }
 
     function burnTree(uint256 tokenId) public onlyRole(ADMIN) {
         address treeOwner = getTokenOwner(tokenId);
-        int24 latitude = treeData[tokenId].gpsLocation.latitude;
-        int24 longitude = treeData[tokenId].gpsLocation.longitude;
+        int32 latitude = treeData[tokenId].gpsLocation.latitude;
+        int32 longitude = treeData[tokenId].gpsLocation.longitude;
 
         delete treeData[tokenId];
         _burn(tokenId);
