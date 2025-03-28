@@ -17,7 +17,7 @@ export default function TransactionList() {
           filteredEvents.map((event, index) => (
             <div key={index} className="flex justify-between text-green-700">
               <span>{event.message}</span>
-              <span className="text-sm text-gray-500">2 hours ago</span>
+              <span className="text-sm text-gray-500">Block ID: {event.timestamp}</span>
             </div>
           ))
         }
