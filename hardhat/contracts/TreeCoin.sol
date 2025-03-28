@@ -49,8 +49,7 @@ contract TreeCoin is ERC20, AccessControl {
     }
 
     function giveReward(address recipient, uint256 amount) public onlyRole(ADMIN) {
-        approve(address(this), amount);
-        super.transferFrom(_owner, recipient, amount);
+        _transfer(_owner, recipient, amount);
         emit NewTransaction(msg.sender, recipient, amount);
     }
 
