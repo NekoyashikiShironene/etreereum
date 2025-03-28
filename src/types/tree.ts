@@ -14,3 +14,23 @@ export type TTreeType = {
     type: string,
     value: number
 }
+
+export type TreeMetadata = {
+    treeId: number,
+    typeId: number,
+    ownerAddress: string,
+    latitude: number,
+    longitude: number,
+    treeImageUrl: string,
+    plantedAt: string,
+    validationStatus: boolean
+}
+
+export type Tree = {
+    tokenId: number;
+    plantedAt: number;
+    metadataURI: string;
+    metadata: TreeMetadata;
+    gpsLocation: { latitude: number; longitude: number };
+    treeImageUrl: string;
+};
