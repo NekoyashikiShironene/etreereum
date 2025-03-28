@@ -27,11 +27,12 @@ import { cn } from "@/lib/utils";
 
 import type { TTreeType } from "@/types/tree";
 
-import { mintTree } from "@/actions/nftree";
+import { requestMintTree } from "@/actions/nftree";
+import Link from "next/link";
 
 
 export default function NFTCollection() {
-  const { accountAddress } = useWallet();
+  const { selectedAccount } = useWallet();
   const { nftreeContract } = useContract();
   const { balance } = nftreeContract;
 
@@ -80,7 +81,7 @@ export default function NFTCollection() {
       formData.set("plantedAtTimestamp", unixTimestamp.toString())
     }
 
-    const result = await mintTree(formData);
+    const result = await requestMintTree(formData);
 
     if (result.error) {
       console.error("Minting Error:", { description: result.message });
@@ -95,7 +96,6 @@ export default function NFTCollection() {
 
 
   useEffect(() => {
-
     function success(position: { coords: { latitude: number; longitude: number; }; }) {
       setCurrentLocation({
         latitude: position.coords.latitude,
@@ -117,9 +117,9 @@ export default function NFTCollection() {
     <div className="bg-green-100 rounded-xl p-6 shadow">
       <h3 className="text-lg font-medium mb-2">NFT Collection</h3>
       <p className="text-3xl font-bold text-green-700">{typeof balance === "string" ? `${balance} Trees` : "Loading..."}</p>
-      <button className="mt-4 border px-4 py-1 rounded bg-white hover:bg-gray-100">
+      <Link href="/gallery" className="mt-4 border px-4 py-1 rounded bg-white hover:bg-gray-100">
         🌲 View Gallery
-      </button>
+      </Link>
 
       <Dialog>
         <DialogTrigger asChild>
@@ -141,7 +141,7 @@ export default function NFTCollection() {
                   name="accountAddress"
                   className="col-span-3"
                   placeholder="0x..."
-                  defaultValue={accountAddress}
+                  defaultValue={selectedAccount}
                   readOnly
                 />
               </div>

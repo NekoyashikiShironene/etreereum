@@ -24,11 +24,10 @@ type TContractContext = {
 const ContractContext = createContext<TContractContext | undefined>(undefined);
 
 export function ContractProvider({ children }: { children: ReactNode }) {
-    const { accountAddress } = useWallet();
+    const { selectedAccount } = useWallet();
     const [provider, setProvider] = useState<BrowserProvider | null>(null);
     const [signer, setSigner] = useState<Signer | null>(null);
     const [events, setEvents] = useState<TEventData[]>([]);
-
 
     const [etreereumContract, setEtreereumContract] = useState<TEtreereumContract>({
         instance: null,
@@ -103,7 +102,7 @@ export function ContractProvider({ children }: { children: ReactNode }) {
             const web3Provider = new ethers.BrowserProvider(window.ethereum);
             setProvider(web3Provider);
 
-            if (!accountAddress) return;
+            if (!selectedAccount) return;
 
             try {
                 const signer = await web3Provider.getSigner();
@@ -115,7 +114,7 @@ export function ContractProvider({ children }: { children: ReactNode }) {
                 const nftContract = new ethers.Contract(TREE_ADDRESS, treeContract.abi, signer);
                 const nftRole = await nftContract.getRoleName();
 
-                const x = await nftContract.getTrees(accountAddress);
+                const x = await nftContract.getTrees(selectedAccount);
 
                 setEtreereumContract(prev => ({
                     ...prev,
@@ -136,15 +135,15 @@ export function ContractProvider({ children }: { children: ReactNode }) {
         };
 
         initContracts();
-    }, [accountAddress]);
+    }, [selectedAccount]);
 
     useEffect(() => {
         if (!etreereumContract.instance) return;
 
         const fetchBalance = async () => {
-            if (!accountAddress) return;
+            if (!selectedAccount) return;
             try {
-                const newBalance = await etreereumContract.instance?.getBalance(accountAddress);
+                const newBalance = await etreereumContract.instance?.getBalance(selectedAccount);
                 const formattedBalance = formatUnits(newBalance, 18);
                 setEtreereumContract(prev => ({
                     ...prev,
@@ -165,15 +164,15 @@ export function ContractProvider({ children }: { children: ReactNode }) {
             etreereumContract.instance?.removeAllListeners("NewTransaction");
         };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [accountAddress, etreereumContract.instance]);
+    }, [selectedAccount, etreereumContract.instance]);
 
     useEffect(() => {
         if (!nftreeContract.instance) return;
 
         const fetchBalance = async () => {
-            if (!accountAddress) return;
+            if (!selectedAccount) return;
             try {
-                const newBalance = await nftreeContract.instance?.balanceOf(accountAddress);
+                const newBalance = await nftreeContract.instance?.balanceOf(selectedAccount);
                 setNFTreeContract(prev => ({
                     ...prev,
                     balance: newBalance.toString()
@@ -197,7 +196,7 @@ export function ContractProvider({ children }: { children: ReactNode }) {
 
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [accountAddress, nftreeContract.instance]);
+    }, [selectedAccount, nftreeContract.instance]);
 
 
     useEffect(() => {
