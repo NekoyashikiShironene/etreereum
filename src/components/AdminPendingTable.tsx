@@ -1,6 +1,6 @@
 "use client";
 
-import type { PlantingTree } from '@/types/Tree'
+import { PlantingTree } from "@/types/tree";
 
 import {
     Dialog,
@@ -11,7 +11,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-  } from "@/components/ui/dialog";
+} from "@/components/ui/dialog";
 import {
     Table,
     TableBody,
@@ -26,11 +26,62 @@ import { Button } from '@/components/ui/button';
 import { Input } from './ui/input';
 
 import Image from 'next/image';
+import { toast } from "sonner";
+import { useContract } from "@/contexts/ContractContext";
+import { approveMintTree } from "@/actions/nftree";
+import { parseUnits } from "ethers";
 
 export default function AdminPendingTable({ planting }: { planting: PlantingTree[] }) {
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const { etreereumContract, nftreeContract } = useContract();
 
+    if (!planting.length)
+        return;
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        toast.info("Approving...");
+
+        if (!etreereumContract.instance || !nftreeContract.instance)
+            return toast.error("Contract instance is not ready")
+
+        const formData = new FormData(e.currentTarget);
+        const owner = formData.get("accountAddress") as string;
+        const plantingId = formData.get("plantingId") as string;
+        const treeId = formData.get("treeId") as string;
+        const plantedAt = formData.get("plantedAt") as string;
+        const plantedTimestamp = (new Date(plantedAt)).getTime() / 1000;
+        const latitude = Number(parseFloat(formData.get("latitude") as string) * 1e7);
+        const longitude = Number(parseFloat(formData.get("longitude") as string) * 1e7);
+
+        // get tree type value
+        const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/tree/type/${treeId}`);
+        const jsonData = await response.json();
+        const { value } = jsonData.data;
+
+
+
+        try {
+            const mintTx = await nftreeContract.instance.mintTree(
+                owner,
+                plantedTimestamp,
+                `${process.env.NEXT_PUBLIC_URL}/api/tree/${plantingId}`,
+                latitude,
+                longitude
+            )
+            const tranferTx = await etreereumContract.instance.giveReward(
+                owner,
+                parseUnits((value ?? 0).toString(), "ether")
+            );
+
+        } catch (e: unknown) {
+            return toast.error("NFTree contract error", { description: String(e) });
+        }
+
+        const result = await approveMintTree(formData);
+        if (result.error)
+            return toast.error("NFTree contract error", { description: result.message });
+
+        toast.success("Approved successfully!");
     }
 
     return (
@@ -53,7 +104,7 @@ export default function AdminPendingTable({ planting }: { planting: PlantingTree
                         <TableRow key={index}>
                             <TableCell className="font-medium text-left">{req.treeId}</TableCell>
                             <TableCell className='text-left'>{req.typeId}</TableCell>
-                            <TableCell className='text-left'>{req.ownerAddress}</TableCell>
+                            <TableCell className='text-left'>{typeof req.ownerAddress === "string" ? req.ownerAddress : "Invalid Address"}</TableCell>
                             <TableCell className='text-left'>Latitude {req.latitude}, Longitude {req.longitude}</TableCell>
                             <TableCell className='text-left'>
                                 <Dialog>
@@ -110,17 +161,32 @@ export default function AdminPendingTable({ planting }: { planting: PlantingTree
                                                 <iframe src={`https://maps.google.com/maps?q=+${req.latitude}+,+${req.longitude}+&hl=en&z=14&output=embed`} className="w-full" allowFullScreen={false} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
                                                 <div className="grid grid-cols-4 items-center gap-4">
                                                     <Label htmlFor="treeType" className="text-left">
-                                                        Tree Type
+                                                        Planting ID
                                                     </Label>
                                                     <div className="col-span-3">
-                                                    <Input
-                                                        id="treeId"
-                                                        name="treeId"
-                                                        type="number"
-                                                        className="col-span-3"
-                                                        defaultValue={req.treeId}
-                                                        readOnly
-                                                    />
+                                                        <Input
+                                                            id="plantingId"
+                                                            name="plantingId"
+                                                            type="number"
+                                                            className="col-span-3"
+                                                            defaultValue={req.treeId}
+                                                            readOnly
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="grid grid-cols-4 items-center gap-4">
+                                                    <Label htmlFor="treeType" className="text-left">
+                                                        Tree ID
+                                                    </Label>
+                                                    <div className="col-span-3">
+                                                        <Input
+                                                            id="treeId"
+                                                            name="treeId"
+                                                            type="number"
+                                                            className="col-span-3"
+                                                            defaultValue={req.typeId}
+                                                            readOnly
+                                                        />
                                                     </div>
                                                 </div>
                                                 <div className="grid grid-cols-4 items-center gap-4">
@@ -132,19 +198,19 @@ export default function AdminPendingTable({ planting }: { planting: PlantingTree
                                                             id="plantedAt"
                                                             name="plantedAt"
                                                             className="col-span-3"
-                                                            defaultValue={req.plantedAt}
+                                                            defaultValue={typeof req.plantedAt === 'string' ? req.plantedAt : String(req.plantedAt)}
                                                             readOnly
                                                         />
                                                     </div>
                                                 </div>
 
-                                                
+
                                                 <div className="grid grid-cols-4 items-center gap-4">
                                                     <Label htmlFor="treeImage" className="text-right">
                                                         Tree Image
                                                     </Label>
                                                     <div className="col-span-3">
-                                                        
+
                                                         <Image
                                                             src={req.treeImageUrl}
                                                             width={200}
