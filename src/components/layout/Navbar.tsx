@@ -14,6 +14,7 @@ export default function Navbar() {
   <div className="hidden md:flex space-x-8">
     <Link href="/" className="text-gray-700 hover:text-green-600 transition-colors">Home</Link>
     <Link href="/ecowallet" className="text-gray-700 hover:text-green-600 transition-colors">EcoWallet</Link>
+    <Link href="/gallery" className="text-gray-700 hover:text-green-600 transition-colors">Gallery</Link>
     <Link href="/dashboard" className="text-gray-700 hover:text-green-600 transition-colors">Dashboard</Link>
     <Link href="/redeem" className="text-gray-700 hover:text-green-600 transition-colors">Redeem</Link>
   </div>
