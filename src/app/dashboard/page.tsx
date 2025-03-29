@@ -9,6 +9,7 @@ import { PlantingTree } from '@/types/tree';
 import AdminPendingTable from '@/components/AdminPendingTable';
 import UserPendingTable from '@/components/UserPendingTable';
 import BurnTreeTable from '@/components/BurnTreeTable';
+import WalletButton from '@/components/WalletButton';
 
 export default function Page() {
     const { nftreeContract } = useContract();
@@ -27,9 +28,7 @@ export default function Page() {
 
                 const res = await fetch(endpoint.toString());
                 if (!res.ok) throw new Error("Failed to fetch requests");
-
                 const requestData = await res.json();
-
                 setRequests(requestData.data);
             }
             catch (error) {
@@ -39,6 +38,17 @@ export default function Page() {
 
         fetchRequests();
     }, [selectedAccount, role]);
+
+
+    if (!selectedAccount)
+        return (
+          <div className="text-center py-12">
+            <h3 className="text-xl font-medium mb-2">Connect wallet to view your dashboard</h3>
+            <div className="flex justify-center">
+              <WalletButton />
+            </div>
+          </div>
+        )
 
     return (
         <div className='text-center'>
