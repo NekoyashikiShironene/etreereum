@@ -1,8 +1,13 @@
+'use client';
+
 import React from 'react'
 import WalletButton from '../WalletButton'
 import Link from 'next/link'
+import { useContract } from '@/contexts/ContractContext';
 
 export default function Navbar() {
+  const { etreereumContract } = useContract();
+
   return (
     <nav className="fixed z-10 top-0 w-full flex items-center justify-between px-8 py-4 bg-white shadow-sm">
 
@@ -14,7 +19,12 @@ export default function Navbar() {
         <Link href="/" className="text-gray-700 hover:text-green-600 transition-colors">Home</Link>
         <Link href="/ecowallet" className="text-gray-700 hover:text-green-600 transition-colors">EcoWallet</Link>
         <Link href="/gallery" className="text-gray-700 hover:text-green-600 transition-colors">Gallery</Link>
-        <Link href="/dashboard" className="text-gray-700 hover:text-green-600 transition-colors">Dashboard</Link>
+        {
+          etreereumContract.role !== "user" ?
+            <Link href="/management" className="text-gray-700 hover:text-green-600 transition-colors">Management</Link>
+            : <Link href="/request" className="text-gray-700 hover:text-green-600 transition-colors">Request</Link>
+        }
+
         <Link href="/redeem" className="text-gray-700 hover:text-green-600 transition-colors">Redeem</Link>
       </div>
 
