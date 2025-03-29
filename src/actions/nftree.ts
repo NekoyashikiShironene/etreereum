@@ -83,17 +83,64 @@ export async function approveMintTree(formData: FormData) {
   }
 }
 
+export async function changeTreeOwner(formData: FormData) {
+  const plantingId = Number(formData.get('plantingId') as string);
+  const newOwnerAddress = formData.get('newOwnerAddress') as string;
+
+  try {
+    await prisma.planting.update({
+      where: {
+        treeId: Number(plantingId)
+      },
+
+      data: {
+        ownerAddress: newOwnerAddress
+      }
+    })
+
+
+    return { message: 'Changed owner successfully.', error: false };
+  } catch (err: unknown) {
+    return { message: String(err), error: true }
+  }
+}
+
 
 export async function burnTree(formData: FormData) {
   const plantingId = formData.get("plantingId") as string;
   try {
     await prisma.planting.delete({
-    where: {
-      treeId: Number(plantingId)
-    }
-  })
+      where: {
+        treeId: Number(plantingId)
+      }
+    })
   } catch (e: unknown) {
-    return {message: String(e), error: true}
+    return { message: String(e), error: true }
   }
 
+}
+
+export async function redeemItem(formData: FormData) {
+  const address = formData.get("address") as string;
+  const itemId = formData.get("itemId") as string;
+  try {
+    const item = await prisma.redemption.findFirst({
+      where: {
+        walletAddress: address,
+        itemId: Number(itemId)
+      }
+    });
+
+    if (item)
+      throw new Error("User has already redeemed");
+
+    await prisma.redemption.create({
+      data: {
+        walletAddress: address,
+        itemId: Number(itemId)
+      }
+    })
+  } catch (e: unknown) {
+    return { message: String(e), error: true }
+  }
 }
