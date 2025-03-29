@@ -32,8 +32,10 @@ export function ContractProvider({ children }: { children: ReactNode }) {
     const [etreereumContract, setEtreereumContract] = useState<TEtreereumContract>({
         instance: null,
         role: "user",
-        balance: "-"
+        balance: "-",
+        admin: []
     });
+
     const [nftreeContract, setNFTreeContract] = useState<TNFTreeContract>({
         instance: null,
         role: "user",
@@ -41,7 +43,8 @@ export function ContractProvider({ children }: { children: ReactNode }) {
         plantedAt: 0,
         latitude: 0,
         longitude: 0,
-        metadataURI: ""
+        metadataURI: "",
+        admin: []
     });
 
     const fetchEvent = async () => {
@@ -105,7 +108,7 @@ export function ContractProvider({ children }: { children: ReactNode }) {
             if (!selectedAccount) return;
 
             try {
-                const signer = await web3Provider.getSigner();
+                const signer = await web3Provider.getSigner(selectedAccount);
                 setSigner(signer);
 
                 const etrContract = new ethers.Contract(TREE_COIN_ADDRESS, treeCoinContract.abi, signer);
@@ -114,18 +117,27 @@ export function ContractProvider({ children }: { children: ReactNode }) {
                 const nftContract = new ethers.Contract(TREE_ADDRESS, treeContract.abi, signer);
                 const nftRole = await nftContract.getRoleName();
 
-                const x = await nftContract.getTrees(selectedAccount);
+                let etrAdmins: string[] = [];
+                let nftAdmins: string[] = [];
+                
+                if (coinRole !== "user")
+                    etrAdmins = await etrContract.getAdmins();
+
+                if (nftRole !== "user")
+                    nftAdmins = await nftContract.getAdmins();
 
                 setEtreereumContract(prev => ({
                     ...prev,
                     instance: etrContract,
-                    role: coinRole
+                    role: coinRole,
+                    admins: etrAdmins
                 }));
 
                 setNFTreeContract(prev => ({
                     ...prev,
                     instance: nftContract,
-                    role: nftRole
+                    role: nftRole,
+                    admin: nftAdmins
                 }));
 
 
@@ -163,6 +175,7 @@ export function ContractProvider({ children }: { children: ReactNode }) {
         return () => {
             etreereumContract.instance?.removeAllListeners("NewTransaction");
         };
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedAccount, etreereumContract.instance]);
 
