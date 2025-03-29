@@ -3,9 +3,9 @@ pragma solidity >=0.8.20;
 
 import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
-import '@openzeppelin/contracts/access/AccessControl.sol';
+import '@openzeppelin/contracts/access/extensions/AccessControlEnumerable.sol';
 
-contract NFTree is ERC721, AccessControl  {
+contract NFTree is ERC721, AccessControlEnumerable  {
     uint256 private _nextTokenId;
     bytes32 public constant ADMIN = keccak256("ADMIN");
     address private _owner;
@@ -36,8 +36,19 @@ contract NFTree is ERC721, AccessControl  {
         _grantRole(ADMIN, owner);
     }
 
-    function supportsInterface(bytes4 interfaceId) public view override(ERC721, AccessControl) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view override(ERC721, AccessControlEnumerable) returns (bool) {
         return super.supportsInterface(interfaceId);
+    }
+
+    function getAdmins() public view onlyRole(ADMIN) returns(address[] memory) {
+        uint256 adminCount = getRoleMemberCount(ADMIN);
+        address[] memory admins = new address[](adminCount);
+
+        for (uint256 i = 0; i < adminCount; i++) {
+            admins[i] = getRoleMember(ADMIN, i);
+        }
+
+        return admins;
     }
     
     function grantAdmin(address account) public onlyRole(DEFAULT_ADMIN_ROLE) {
@@ -96,7 +107,7 @@ contract NFTree is ERC721, AccessControl  {
         safeTransferFrom(msg.sender, newOwner, tokenId);
         userOwnedTree[newOwner].push(tokenId);
 
-        // remove token from the old owner
+        // remove token from the owner
         uint256 oldOwnerTreesLength = userOwnedTree[msg.sender].length;
         for (uint256 i=0; i<oldOwnerTreesLength; i++) {
             if (userOwnedTree[msg.sender][i] == tokenId) {
@@ -130,7 +141,19 @@ contract NFTree is ERC721, AccessControl  {
         int32 longitude = treeData[tokenId].gpsLocation.longitude;
 
         delete treeData[tokenId];
+
+        uint256 ownerTreesLength = userOwnedTree[treeOwner].length;
+        for (uint256 i=0; i<ownerTreesLength; i++) {
+            if (userOwnedTree[treeOwner][i] == tokenId) {
+                userOwnedTree[treeOwner][i] = userOwnedTree[treeOwner][ownerTreesLength - 1];
+                userOwnedTree[treeOwner].pop();
+                break;
+            }
+        }
+
         _burn(tokenId);
+
+
 
         emit BurnTree(treeOwner, tokenId, latitude, longitude);
     }

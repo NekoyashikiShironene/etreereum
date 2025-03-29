@@ -2,9 +2,9 @@
 pragma solidity >=0.8.20;
 
 import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
-import '@openzeppelin/contracts/access/AccessControl.sol';
+import '@openzeppelin/contracts/access/extensions/AccessControlEnumerable.sol';
 
-contract TreeCoin is ERC20, AccessControl {
+contract TreeCoin is ERC20, AccessControlEnumerable {
     bytes32 public constant ADMIN = keccak256("ADMIN");
     address private _owner;
 
@@ -15,6 +15,17 @@ contract TreeCoin is ERC20, AccessControl {
         _grantRole(DEFAULT_ADMIN_ROLE, owner);
         _grantRole(ADMIN, owner);
         _mint(owner, 10000000 * 10 ** 18);
+    }
+
+    function getAdmins() public view onlyRole(ADMIN) returns(address[] memory) {
+        uint256 adminCount = getRoleMemberCount(ADMIN);
+        address[] memory admins = new address[](adminCount);
+
+        for (uint256 i = 0; i < adminCount; i++) {
+            admins[i] = getRoleMember(ADMIN, i);
+        }
+
+        return admins;
     }
 
     function grantAdmin(address account) public onlyRole(DEFAULT_ADMIN_ROLE) {
