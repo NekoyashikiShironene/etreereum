@@ -1,7 +1,6 @@
 "use client";
 
-import type { PlantingTree } from '@/types/Tree'
-
+import type { PlantingTree } from "@/types/tree";
 import {
     Table,
     TableBody,
@@ -17,7 +16,7 @@ export default function UserPendingTable({ planting }: { planting: PlantingTree[
         <div className='text-center'>
             <h1 className="text-2xl font-bold mb-4">My Dashboard</h1>
             
-                <Table className='max-w-[1200px] mx-auto'>
+                <Table className='max-w-[1200px] mx-auto h-[24rem] overflow-auto'>
                     <TableCaption>A list of pending trees.</TableCaption>
                     <TableHeader>
                         <TableRow>
@@ -39,8 +38,6 @@ export default function UserPendingTable({ planting }: { planting: PlantingTree[
                     </TableBody>
                 </Table>
             
-
-
         </div>
     );
 }
