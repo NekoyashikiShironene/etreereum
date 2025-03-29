@@ -31,8 +31,30 @@ model Tree {
 }
 
 model User {
-  walletAddress String     @id @db.VarChar(50)
-  name          String?    @db.VarChar(255)
-  email         String?    @db.VarChar(255)
+  walletAddress String       @id @db.VarChar(50)
+  name          String?      @db.VarChar(255)
+  email         String?      @db.VarChar(255)
   Planting      Planting[]
+  Redemption    Redemption[]
+}
+
+model Item {
+  itemId      Int          @id
+  title       String       @db.VarChar(255)
+  description String       @db.VarChar(255)
+  price       Int
+  imageUrl    String       @db.VarChar(255)
+  Redemption  Redemption[]
+}
+
+model Redemption {
+  redemptionId  Int       @id @unique(map: "redemptionId") @default(autoincrement())
+  walletAddress String    @db.VarChar(50)
+  itemId        Int
+  redeemedAt    DateTime? @default(now()) @db.Timestamp(0)
+  Item          Item      @relation(fields: [itemId], references: [itemId], onDelete: NoAction, onUpdate: NoAction, map: "Redemption_ibfk_1")
+  User          User      @relation(fields: [walletAddress], references: [walletAddress], onUpdate: Restrict, map: "Redemption_ibfk_2")
+
+  @@index([itemId], map: "itemId")
+  @@index([walletAddress], map: "walletAddress")
 }
