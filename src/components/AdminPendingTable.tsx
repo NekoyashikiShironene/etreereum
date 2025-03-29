@@ -28,18 +28,47 @@ import { Input } from './ui/input';
 import Image from 'next/image';
 import { toast } from "sonner";
 import { useContract } from "@/contexts/ContractContext";
-import { approveMintTree } from "@/actions/nftree";
+import { approveMintTree, rejectMintTree } from "@/actions/nftree";
 import { parseUnits } from "ethers";
+import { useEffect, useState } from "react";
+import { useWallet } from "@/contexts/WalletContext";
 
-export default function AdminPendingTable({ planting }: { planting: PlantingTree[] }) {
+export default function AdminPendingTable() {
+    const { selectedAccount } = useWallet();
     const { etreereumContract, nftreeContract } = useContract();
+    const [requests, setRequests] = useState<PlantingTree[]>([]);
 
-    if (!planting.length)
-        return;
+    const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+
+    const fetchRequests = async () => {
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/trees`);
+            const requestData = await res.json();
+            setRequests(requestData.data);
+        }
+        catch (error) {
+            console.error("Error fetching requests:", error);
+        }
+    };
+
+    useEffect(() => {
+        if (!selectedAccount || nftreeContract.role === "user") {
+            setRequests([]);
+            return;
+        }
+
+        etreereumContract.instance?.removeListener("NewTransaction", () => fetchRequests());
+        etreereumContract.instance?.on("NewTransaction", () => fetchRequests());
+
+        fetchRequests();
+        return () => {
+            etreereumContract.instance?.removeListener("NewTransaction", () => fetchRequests())
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [nftreeContract.role, selectedAccount]);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        toast.info("Approving...");
 
         if (!etreereumContract.instance || !nftreeContract.instance)
             return toast.error("Contract instance is not ready")
@@ -53,42 +82,52 @@ export default function AdminPendingTable({ planting }: { planting: PlantingTree
         const latitude = Number(parseFloat(formData.get("latitude") as string) * 1e7);
         const longitude = Number(parseFloat(formData.get("longitude") as string) * 1e7);
 
-        // get tree type value
-        const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/tree/type/${treeId}`);
-        const jsonData = await response.json();
-        const { value } = jsonData.data;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const submitter = (e as any).nativeEvent.submitter
+        const action = submitter.value
 
+        if (action === "mint") {
+            toast.info("Approving...");
+            const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/tree/type/${treeId}`);
+            const jsonData = await response.json();
+            const { value } = jsonData.data;
+            try {
+                await nftreeContract.instance?.mintTree(
+                    owner,
+                    plantedTimestamp,
+                    `${process.env.NEXT_PUBLIC_URL}/api/tree/${plantingId}`,
+                    latitude,
+                    longitude
+                )
+                await etreereumContract.instance?.giveReward(
+                    owner,
+                    parseUnits((value ?? 0).toString(), "ether")
+                );
 
+            } catch (e: unknown) {
+                return toast.error("NFTree contract error", { description: String(e) });
+            }
 
-        try {
-            const mintTx = await nftreeContract.instance.mintTree(
-                owner,
-                plantedTimestamp,
-                `${process.env.NEXT_PUBLIC_URL}/api/tree/${plantingId}`,
-                latitude,
-                longitude
-            )
-            const tranferTx = await etreereumContract.instance.giveReward(
-                owner,
-                parseUnits((value ?? 0).toString(), "ether")
-            );
+            const result = await approveMintTree(formData);
+            if (result.error)
+                return toast.error("NFTree contract error", { description: result.message });
 
-        } catch (e: unknown) {
-            return toast.error("NFTree contract error", { description: String(e) });
+            toast.success("Approved successfully!");
+        } else {
+            toast.info("Rejecting...");
+            const result = await rejectMintTree(formData);
+            if (result.error)
+                return toast.error("NFTree contract error", { description: result.message });
+            toast.success("Rejected successfully!");
         }
-
-        const result = await approveMintTree(formData);
-        if (result.error)
-            return toast.error("NFTree contract error", { description: result.message });
-
-        toast.success("Approved successfully!");
+        setIsDialogOpen(false);
     }
 
     return (
         <div className='text-center'>
             <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
 
-            <Table className='max-w-[1200px] mx-auto h-[24rem] overflow-auto'>
+            <Table className='max-w-[1200px] mx-auto max-h-screen overflow-auto'>
                 <TableCaption>A list of pending trees.</TableCaption>
                 <TableHeader>
                     <TableRow>
@@ -100,14 +139,14 @@ export default function AdminPendingTable({ planting }: { planting: PlantingTree
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {planting.map((req: PlantingTree, index) => (
+                    {requests.map((req: PlantingTree, index) => (
                         <TableRow key={index}>
                             <TableCell className="font-medium text-left">{req.treeId}</TableCell>
                             <TableCell className='text-left'>{req.typeId}</TableCell>
                             <TableCell className='text-left'>{typeof req.ownerAddress === "string" ? req.ownerAddress : "Invalid Address"}</TableCell>
                             <TableCell className='text-left'>Latitude {req.latitude}, Longitude {req.longitude}</TableCell>
                             <TableCell className='text-left'>
-                                <Dialog>
+                                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                                     <DialogTrigger asChild>
                                         <Button variant="outline">🌲 Mint Tree</Button>
                                     </DialogTrigger>
@@ -223,9 +262,12 @@ export default function AdminPendingTable({ planting }: { planting: PlantingTree
                                                 </div>
                                             </div>
                                             <DialogFooter>
-                                                <DialogClose asChild>
-                                                    <Button type="submit">Mint Tree</Button>
-                                                </DialogClose>
+                                                <Button type="submit" value="mint">
+                                                    Mint Tree
+                                                </Button>
+                                                <Button type="submit" value="reject" variant="outline">
+                                                    Reject
+                                                </Button>
                                             </DialogFooter>
                                         </form>
 
@@ -239,6 +281,6 @@ export default function AdminPendingTable({ planting }: { planting: PlantingTree
 
 
 
-        </div>
+        </div >
     );
 }
