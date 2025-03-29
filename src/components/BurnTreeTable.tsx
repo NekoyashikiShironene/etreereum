@@ -78,7 +78,6 @@ export default function BurnTreeTable() {
         fetchGallery()
     }, [nftreeContract.instance, selectedAccount])
 
-    console.log("Tree", trees);
 
     const handleBurnTree = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -97,7 +96,7 @@ export default function BurnTreeTable() {
     }
 
     return (
-        <Table className='max-w-[1200px] mx-auto'>
+        <Table className='max-w-[1200px] mx-auto h-[24rem] overflow-auto'>
             <TableCaption>Active Trees.</TableCaption>
             <TableHeader>
                 <TableRow>
