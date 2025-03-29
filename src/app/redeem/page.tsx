@@ -5,7 +5,7 @@ import RedeemCard from '@/components/RedeemCard';
 export default async function RedeemPage() {
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="container mx-auto py-8 pt-[5rem]">
       <div className="mb-8 text-center">
         <h1 className="text-3xl font-bold tracking-tight mb-2">Redeem Your ECO Tokens</h1>
         <p className="text-muted-foreground max-w-2xl mx-auto">
