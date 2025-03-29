@@ -88,7 +88,7 @@ export default function AdminPendingTable({ planting }: { planting: PlantingTree
         <div className='text-center'>
             <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
 
-            <Table className='max-w-[1200px] mx-auto'>
+            <Table className='max-w-[1200px] mx-auto h-[24rem] overflow-auto'>
                 <TableCaption>A list of pending trees.</TableCaption>
                 <TableHeader>
                     <TableRow>
