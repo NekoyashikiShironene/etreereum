@@ -96,7 +96,7 @@ export default function BurnTreeTable() {
     }
 
     return (
-        <Table className='max-w-[1200px] mx-auto h-[24rem] overflow-auto'>
+        <Table className='max-w-[1200px] mx-auto max-h-screen overflow-auto'>
             <TableCaption>Active Trees.</TableCaption>
             <TableHeader>
                 <TableRow>
