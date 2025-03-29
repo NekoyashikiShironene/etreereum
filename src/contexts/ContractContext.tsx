@@ -33,6 +33,7 @@ export function ContractProvider({ children }: { children: ReactNode }) {
         instance: null,
         role: "user",
         balance: "-",
+        totalSupply: "-",
         admin: []
     });
 
@@ -50,15 +51,24 @@ export function ContractProvider({ children }: { children: ReactNode }) {
     const fetchEvent = async () => {
         if (!etreereumContract.instance || !nftreeContract.instance) return;
 
-        const [mintEvents, burnEvents, ownerEvents, transactionEvents] = await Promise.all([
+        const [
+            mintTreeEvents,
+            burnTreeEvents,
+            ownerEvents,
+            mintTokenEvents,
+            burnTokenEvents,
+            transactionEvents,
+        ] = await Promise.all([
             nftreeContract.instance.queryFilter("MintTree", 0, "latest"),
             nftreeContract.instance.queryFilter("BurnTree", 0, "latest"),
             nftreeContract.instance.queryFilter("ChangeOwner", 0, "latest"),
+            etreereumContract.instance.queryFilter("MintToken", 0, "latest"),
+            etreereumContract.instance.queryFilter("BurnToken", 0, "latest"),
             etreereumContract.instance.queryFilter("NewTransaction", 0, "latest")
         ]);
 
         const allEvents: TEventData[] = [
-            ...(mintEvents ?? []).map(e => ({
+            ...(mintTreeEvents ?? []).map(e => ({
                 type: "MintTree",
                 owner: e.args.owner,
                 plantedAt: Number(e.args.plantedAt),
@@ -67,7 +77,7 @@ export function ContractProvider({ children }: { children: ReactNode }) {
                 longitude: Number(e.args.longitude),
                 blockNumber: e.blockNumber
             })),
-            ...(burnEvents ?? []).map(e => ({
+            ...(burnTreeEvents ?? []).map(e => ({
                 type: "BurnTree",
                 owner: e.args.owner,
                 tokenId: Number(e.args.tokenId),
@@ -81,6 +91,18 @@ export function ContractProvider({ children }: { children: ReactNode }) {
                 newOwner: e.args.newOwner,
                 blockNumber: e.blockNumber
             })),
+            ...(mintTokenEvents ?? []).map(e => ({
+                type: "MintToken",
+                from: e.args.from,
+                amount: ethers.formatUnits(e.args.amount, 18),
+                blockNumber: e.blockNumber
+            })),
+            ...(burnTokenEvents ?? []).map(e => ({
+                type: "BurnToken",
+                from: e.args.from,
+                amount: ethers.formatUnits(e.args.amount, 18),
+                blockNumber: e.blockNumber
+            })),
             ...(transactionEvents ?? []).map(e => ({
                 type: "NewTransaction",
                 sender: e.args.sender,
@@ -90,7 +112,7 @@ export function ContractProvider({ children }: { children: ReactNode }) {
             }))
         ];
 
-        const sortedEvents = allEvents.sort((a, b) =>  b.blockNumber - a.blockNumber).slice(0, 1000);
+        const sortedEvents = allEvents.sort((a, b) => b.blockNumber - a.blockNumber).slice(0, 1000);
         setEvents(sortedEvents);
         console.log("Fetched events:", sortedEvents);
     };
@@ -119,7 +141,7 @@ export function ContractProvider({ children }: { children: ReactNode }) {
 
                 let etrAdmins: string[] = [];
                 let nftAdmins: string[] = [];
-                
+
                 if (coinRole !== "user")
                     etrAdmins = await etrContract.getAdmins();
 
@@ -157,9 +179,13 @@ export function ContractProvider({ children }: { children: ReactNode }) {
             try {
                 const newBalance = await etreereumContract.instance?.getBalance(selectedAccount);
                 const formattedBalance = formatUnits(newBalance, 18);
+
+                const totalSupply = await etreereumContract.instance?.getTotalSupply();
+                const formattedTotalSupply = formatUnits(totalSupply, 18);
                 setEtreereumContract(prev => ({
                     ...prev,
-                    balance: formattedBalance
+                    balance: formattedBalance,
+                    totalSupply: formattedTotalSupply
                 }));
 
             } catch (error) {
@@ -169,14 +195,18 @@ export function ContractProvider({ children }: { children: ReactNode }) {
 
         fetchBalance();
 
+        etreereumContract.instance.on("MintToken", () => fetchBalance().then(() => fetchEvent()));
+        etreereumContract.instance.on("BurnToken", () => fetchBalance().then(() => fetchEvent()));
         etreereumContract.instance.on("NewTransaction", () => fetchBalance().then(() => fetchEvent()));
 
 
         return () => {
-            etreereumContract.instance?.removeAllListeners("NewTransaction");
+            etreereumContract.instance?.removeAllListeners("MintToken")
+                .then(() => etreereumContract.instance?.removeAllListeners("BurnToken"))
+                .then(() => etreereumContract.instance?.removeAllListeners("NewTransaction"));
         };
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedAccount, etreereumContract.instance]);
 
     useEffect(() => {
