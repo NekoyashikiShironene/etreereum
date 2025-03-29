@@ -8,8 +8,10 @@ contract TreeCoin is ERC20, AccessControlEnumerable {
     bytes32 public constant ADMIN = keccak256("ADMIN");
     address private _owner;
 
-    event MintToken(address from, uint256 amount);
-    event BurnToken(address from, uint256 amount);
+    event GrantAdmin(address sender, address account);
+    event RevokeAdmin(address sender, address account);
+    event MintToken(address sender, address from, uint256 amount);
+    event BurnToken(address sender, address from, uint256 amount);
     event NewTransaction(address sender, address recipient, uint256 amount);
     
 
@@ -33,11 +35,13 @@ contract TreeCoin is ERC20, AccessControlEnumerable {
 
     function grantAdmin(address account) public onlyRole(DEFAULT_ADMIN_ROLE) {
         grantRole(ADMIN, account);
+        emit GrantAdmin(msg.sender, account);
     }
 
     function revokeAdmin(address account) public onlyRole(DEFAULT_ADMIN_ROLE) {
         require(account != _owner, "Can not revoke owner from admin role");
         revokeRole(ADMIN, account);
+        emit RevokeAdmin(msg.sender, account);
     }
 
     function getRoleName() public view returns(string memory) {
@@ -73,12 +77,12 @@ contract TreeCoin is ERC20, AccessControlEnumerable {
 
     function mint(address account, uint256 amount) public onlyRole(ADMIN) {
         _mint(account, amount);
-        emit MintToken(account, amount);
+        emit MintToken(msg.sender, account, amount);
     }
 
     function burn(address account, uint256 amount) public onlyRole(ADMIN) {
         _burn(account, amount);
-        emit BurnToken(account, amount);
+        emit BurnToken(msg.sender, account, amount);
     }
 }
 

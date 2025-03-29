@@ -10,8 +10,10 @@ contract NFTree is ERC721, AccessControlEnumerable  {
     bytes32 public constant ADMIN = keccak256("ADMIN");
     address private _owner;
 
-    event MintTree(address owner, uint256 plantedAt, string metadataURI, int32 latitude, int32 longitude);
-    event BurnTree(address owner, uint256 tokenId, int32 latitude, int32 longitude);
+    event GrantAdmin(address sender, address account);
+    event RevokeAdmin(address sender, address account);
+    event MintTree(address sender, address owner, uint256 plantedAt, string metadataURI, int32 latitude, int32 longitude);
+    event BurnTree(address sender, address owner, uint256 tokenId, int32 latitude, int32 longitude);
     event ChangeOwner(address oldOwner, address newOwner);
 
     struct Coordinates {
@@ -53,11 +55,13 @@ contract NFTree is ERC721, AccessControlEnumerable  {
     
     function grantAdmin(address account) public onlyRole(DEFAULT_ADMIN_ROLE) {
         grantRole(ADMIN, account);
+        emit GrantAdmin(msg.sender, account);
     }
 
     function revokeAdmin(address account) public onlyRole(DEFAULT_ADMIN_ROLE) {
         require(account != _owner, "Can not revoke owner from admin role");
         revokeRole(ADMIN, account);
+        emit RevokeAdmin(msg.sender, account);
     }
 
     function getRoleName() public view returns(string memory) {
@@ -132,7 +136,7 @@ contract NFTree is ERC721, AccessControlEnumerable  {
         _safeMint(user, _nextTokenId);
         userOwnedTree[user].push(_nextTokenId);
         _nextTokenId++;
-        emit MintTree(user, plantedAt, metadataURI, latitude, longitude);
+        emit MintTree(msg.sender, user, plantedAt, metadataURI, latitude, longitude);
     }
 
     function burnTree(uint256 tokenId) public onlyRole(ADMIN) {
@@ -155,7 +159,7 @@ contract NFTree is ERC721, AccessControlEnumerable  {
 
 
 
-        emit BurnTree(treeOwner, tokenId, latitude, longitude);
+        emit BurnTree(msg.sender, treeOwner, tokenId, latitude, longitude);
     }
 
 }
