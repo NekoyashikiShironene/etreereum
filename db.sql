@@ -23,6 +23,23 @@ CREATE TABLE Planting (
     FOREIGN KEY (ownerAddress) REFERENCES User(walletAddress)
 );
 
+CREATE TABLE Item (
+    itemId      INT PRIMARY KEY AUTO_INCREMENT,
+    title       VARCHAR(255) NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    price       INT NOT NULL,
+    imageUrl    VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE Redemption (
+    redemptionId  INT PRIMARY KEY AUTO_INCREMENT,
+    walletAddress VARCHAR(50) NOT NULL,  
+    itemId        INT NOT NULL,
+    redeemedAt    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (itemId) REFERENCES Item(itemId)
+);
+
+
 INSERT INTO Tree VALUES 
 (1001, 'Takhian Thong', 25.4), 
 (1002, 'Siamese Rosewood', 23.7),
@@ -48,4 +65,29 @@ VALUES
 DROP TABLE Planting;
 DROP TABLE User;
 DROP TABLE Tree;
+
+
+-- 
+INSERT INTO Planting (treeId, typeId, ownerAddress, latitude, longitude, treeImageUrl, validationStatus) VALUES
+(500123, 1001, '0x6de2591e6014481082a5a07bfe4d1b138a3f92d6', 37.77490000, -122.41940000, 'http://localhost:3000/default.jpg', 0),
+(500456, 1003, '0x6de2591e6014481082a5a07bfe4d1b138a3f92d6', 34.05220000, -118.24370000, 'http://localhost:3000/default.jpg', 0),
+(500789, 1005, '0x6de2591e6014481082a5a07bfe4d1b138a3f92d6', 40.71280000, -74.00600000, 'http://localhost:3000/default.jpg', 0),
+(501111, 1007, '0x6de2591e6014481082a5a07bfe4d1b138a3f92d6', 51.50740000, -0.12780000, 'http://localhost:3000/default.jpg', 0),
+(501222, 1009, '0x6de2591e6014481082a5a07bfe4d1b138a3f92d6', 48.85660000, 2.35220000, 'http://localhost:3000/default.jpg', 0),
+(501555, 1002, '0x6de2591e6014481082a5a07bfe4d1b138a3f92d6', -33.86880000, 151.20930000, 'http://localhost:3000/default.jpg', 0),
+(501789, 1004, '0x6de2591e6014481082a5a07bfe4d1b138a3f92d6', -22.90680000, -43.17290000, 'http://localhost:3000/default.jpg', 0),
+(502000, 1006, '0x6de2591e6014481082a5a07bfe4d1b138a3f92d6', 35.68950000, 139.69170000, 'http://localhost:3000/default.jpg', 0),
+(502333, 1008, '0x6de2591e6014481082a5a07bfe4d1b138a3f92d6', 55.75580000, 37.61730000, 'http://localhost:3000/default.jpg', 0),
+(502666, 1010, '0x6de2591e6014481082a5a07bfe4d1b138a3f92d6', 19.43260000, -99.13320000, 'http://localhost:3000/default.jpg', 0);
+
+INSERT INTO Item (itemId, title, description, price, imageUrl) VALUES
+(1001, 'Bamboo Water Bottle', 'Sustainable bamboo water bottle that keeps your drinks at the perfect temperature.', 200, '/placeholder.svg?height=200&width=400'),
+(1002, 'Organic Tote Bag', '100% organic cotton tote bag, perfect for shopping and reducing plastic waste.', 150, '/placeholder.svg?height=200&width=400'),
+(1003, 'Metal Straw Set', 'Reusable metal straws with cleaning brush to help reduce single-use plastic.', 100, '/placeholder.svg?height=200&width=400'),
+(1004, 'Eco-Friendly Notebook', 'Notebook made from recycled paper, perfect for jotting down ideas sustainably.', 120, '/placeholder.svg?height=200&width=400'),
+(1005, 'Solar-Powered Charger', 'Portable solar charger to keep your devices powered with renewable energy.', 600, '/placeholder.svg?height=200&width=400');
+
+INSERT INTO Redemption (redemptionId, walletAddress, itemId) VALUES
+(100001, "0x3A3593FacB8Aa2Fc4157C9C1EC1C540373920A47", 1001),
+(100002, "0x3A3593FacB8Aa2Fc4157C9C1EC1C540373920A47", 1002)
 
