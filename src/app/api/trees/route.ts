@@ -8,14 +8,16 @@ export async function GET(req: NextRequest) {
     if (!user)
         treeData = await prisma.planting.findMany({
             where: {
-                validationStatus: false
+                validationStatus: 0
             }  
         });
     else
         treeData = await prisma.planting.findMany({
             where: {
                 ownerAddress: user,
-                validationStatus: false
+            },
+            orderBy: {
+                treeId: 'desc'
             }
         });
 
