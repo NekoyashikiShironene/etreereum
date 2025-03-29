@@ -15,7 +15,7 @@ model Planting {
   longitude        Decimal?  @db.Decimal(11, 8)
   treeImageUrl     String    @db.VarChar(255)
   plantedAt        DateTime? @default(now()) @db.Timestamp(0)
-  validationStatus Boolean?  @default(dbgenerated("b'0'")) @db.Bit(1)
+  validationStatus Boolean?  @default(false)
   Tree             Tree?     @relation(fields: [typeId], references: [typeId], onDelete: NoAction, onUpdate: NoAction, map: "Planting_ibfk_1")
   User             User?     @relation(fields: [ownerAddress], references: [walletAddress], onDelete: NoAction, onUpdate: NoAction, map: "Planting_ibfk_2")
 
