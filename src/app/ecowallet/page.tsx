@@ -7,7 +7,7 @@ import TransactionList from "@/components/TransactionList";
 export default function Page() {
   
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-800">
+    <div className="min-h-screen bg-gray-50 text-gray-800 pt-[5rem]">
       <div className="p-6 sm:p-10 grid gap-10">
         <div className="grid sm:grid-cols-2 gap-6">
           <div className="bg-green-100 p-6 rounded-2xl shadow-md">

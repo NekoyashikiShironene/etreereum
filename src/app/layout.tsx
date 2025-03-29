@@ -35,7 +35,7 @@ export default function RootLayout({
         <WalletProvider>
           <ContractProvider>
             <Navbar />
-            <main className="p-6 mt-[5rem] sm:p-10">{children}</main>
+            <main className="p-6 sm:p-10">{children}</main>
             <Toaster />
           </ContractProvider>
         </WalletProvider>
