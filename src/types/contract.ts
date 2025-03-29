@@ -8,6 +8,7 @@ export type TContract = {
 }
 
 export type TEtreereumContract = TContract & {  
+    totalSupply: string
 }
 
 export type TNFTreeContract = TContract & {
