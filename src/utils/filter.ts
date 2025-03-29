@@ -37,16 +37,16 @@ export function toHumanReadableEvents(events: TEventData[], currentUserAddress: 
                 color = 'green';
                 icon = '🌱';
                 message = isUserInvolved(event?.owner) 
-                    ? `You planted a new tree at (${(event?.latitude ?? 0) / 10000}, ${(event?.longitude ?? 0) / 10000})`
-                    : `${event?.owner} planted a new tree at (${event?.latitude}, ${event?.longitude})`;
+                    ? `You planted a new tree at (${(event?.latitude ?? 0) / 10e6}, ${(event?.longitude ?? 0) / 10e6})`
+                    : `${event?.owner} planted a new tree at (${(event?.latitude ?? 0) / 10e6}, ${(event?.longitude ?? 0) / 10e6})`;
                 break;
 
             case "BurnTree":
                 color = 'red';
                 icon = '🔥';
                 message = isUserInvolved(event?.owner)
-                    ? `You removed your tree (ID: ${event?.tokenId}) at (${event?.latitude}, ${event?.longitude})`
-                    : `${event?.owner} removed their tree (ID: ${event?.tokenId})`;
+                    ? `Your tree was burnt (ID: ${event?.tokenId}) at (${(event?.latitude ?? 0) / 10e6}, ${(event?.longitude ?? 0) / 10e6})`
+                    : `${event?.owner}'s tree was burnt (ID: ${event?.tokenId}) at (${(event?.latitude ?? 0) / 10e6}, ${(event?.longitude ?? 0) / 10e6})`;
                 break;
 
             case "ChangeOwner":
