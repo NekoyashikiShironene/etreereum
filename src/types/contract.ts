@@ -3,7 +3,8 @@ import { Contract } from "ethers"
 export type TContract = {
     instance: Contract | null,
     role: string,
-    balance: string
+    balance: string,
+    admin: string[]
 }
 
 export type TEtreereumContract = TContract & {  
