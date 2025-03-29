@@ -1,3 +1,5 @@
+"use client"
+
 import { parseUnits } from "ethers";
 import { useContract } from "@/contexts/ContractContext";
 
@@ -16,8 +18,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
+import { toast } from "sonner";
+import { useWallet } from "@/contexts/WalletContext";
 
 export default function TokenBalance() {
+  const { selectedAccount, connectWallet } = useWallet();
   const { etreereumContract } = useContract();
   const { instance: etreereum, balance } = etreereumContract;
 
@@ -30,10 +35,9 @@ export default function TokenBalance() {
     try {
       const tx = await etreereum.transfer(address, parseUnits((amount ?? 0).toString(), "ether"));
     } catch (e: unknown) {
-      alert("Failed: " + e);
+      return toast.error("Transfered failed", { description: String(e) });
     }
-
-
+    toast.success("Transfered successfully");
   }
 
   return (
@@ -41,13 +45,11 @@ export default function TokenBalance() {
       <h3 className="text-lg font-medium mb-2">Token Balance</h3>
       <p className="text-3xl font-bold text-green-700">{balance} ETR</p>
       <div className="flex gap-2 mt-4">
-        <button className="bg-green-600 text-white px-4 py-1 rounded hover:bg-green-700">
-          + Add Tokens
-        </button>
-
-        <Dialog>
+        {
+          selectedAccount ? (
+<Dialog>
           <DialogTrigger asChild>
-            <Button variant="outline">Transfer</Button>
+            <Button variant="outline">↔ Transfer</Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
@@ -87,8 +89,12 @@ export default function TokenBalance() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+          ) : (
+            <Button variant="outline" onClick={() => connectWallet()}>↔ Connect wallet to transfer</Button>
+          )
+        }
+        
 
-        <button onClick={() => handleTransfer()} className="border px-4 py-1 rounded">↔ Transfer</button>
       </div>
     </div>
   );

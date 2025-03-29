@@ -32,7 +32,7 @@ import Link from "next/link";
 
 
 export default function NFTCollection() {
-  const { selectedAccount } = useWallet();
+  const { selectedAccount, connectWallet } = useWallet();
   const { nftreeContract } = useContract();
   const { balance } = nftreeContract;
 
@@ -103,7 +103,7 @@ export default function NFTCollection() {
       })
     }
 
-    function error() {}
+    function error() { }
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(success, error);
     } else {
@@ -116,163 +116,174 @@ export default function NFTCollection() {
   return (
     <div className="bg-green-100 rounded-xl p-6 shadow">
       <h3 className="text-lg font-medium mb-2">NFT Collection</h3>
-      <p className="text-3xl font-bold text-green-700">{typeof balance === "string" ? `${balance} Trees` : "Loading..."}</p>
-      <Link href="/gallery" className="mt-4 border px-4 py-1 rounded bg-white hover:bg-gray-100">
-        🌲 View Gallery
+
+      <p className="text-3xl font-bold text-green-700 mb-4">{typeof balance === "string" ? `${balance} Trees` : "Loading..."}</p>
+      <Link href="/gallery" >
+        <Button variant="outline" className="cursor-pointer">
+          🌲 View Gallery
+        </Button>
       </Link>
 
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button variant="outline">🌲 Mint Tree</Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Mint a New Tree</DialogTitle>
-            <DialogDescription>Enter the details to mint a new tree NFT.</DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleSubmit}>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="accountAddress" className="text-left">
-                  Owner Address
-                </Label>
-                <Input
-                  id="accountAddress"
-                  name="accountAddress"
-                  className="col-span-3"
-                  placeholder="0x..."
-                  defaultValue={selectedAccount}
-                  readOnly
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="latitude" className="text-left">
-                  Latitude
-                </Label>
-                <Input
-                  id="latitude"
-                  name="latitude"
-                  type="number"
-                  step="0.000001"
-                  className="col-span-3"
-                  defaultValue={currentLocaltion.latitude}
-                  onChange={(e) => setCurrentLocation(prev => ({...prev, latitude: Number(e.target.value)}))}
-                  placeholder="e.g. 37.7749"
-                  required
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="longitude" className="text-left">
-                  Longitude
-                </Label>
-                <Input
-                  id="longitude"
-                  name="longitude"
-                  type="number"
-                  step="0.000001"
-                  className="col-span-3"
-                  defaultValue={currentLocaltion.longitude}
-                  onChange={(e) => setCurrentLocation(prev => ({...prev, longitude: Number(e.target.value)}))}
-                  placeholder="e.g. -122.4194"
-                  required
-                />
-              </div>
-              <iframe src={`https://maps.google.com/maps?q=+${currentLocaltion.latitude}+,+${currentLocaltion.longitude}+&hl=en&z=14&output=embed`} className="w-full" allowFullScreen={false} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="treeType" className="text-left">
-                  Tree Type
-                </Label>
-                <div className="col-span-3">
-                  <Select name="treeType" required>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select tree type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {
-                        treeTypes.map((tree: TTreeType) => (
-                          <SelectItem key={tree.typeId} value={tree.typeId.toString()}>{tree.type}</SelectItem>
-                        ))
-                      }
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="plantingDate" className="text-left">
-                  Planting Date
-                </Label>
-                <div className="col-span-3">
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn("w-full justify-start text-left font-normal", !date && "text-muted-foreground")}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {date ? format(date, "PPP") : "Select date"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                      <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
-                    </PopoverContent>
-                  </Popover>
-                  <input type="hidden" name="plantingDate" value={date ? format(date, "yyyy-MM-dd") : ""} />
-                </div>
-              </div>
+      {
+        selectedAccount ? (
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="ml-2 cursor-pointer">🌲 Mint Tree</Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Mint a New Tree</DialogTitle>
+                <DialogDescription>Enter the details to mint a new tree NFT.</DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleSubmit}>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="accountAddress" className="text-left">
+                      Owner Address
+                    </Label>
+                    <Input
+                      id="accountAddress"
+                      name="accountAddress"
+                      className="col-span-3"
+                      placeholder="0x..."
+                      defaultValue={selectedAccount}
+                      readOnly
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="latitude" className="text-left">
+                      Latitude
+                    </Label>
+                    <Input
+                      id="latitude"
+                      name="latitude"
+                      type="number"
+                      step="0.000001"
+                      className="col-span-3"
+                      defaultValue={currentLocaltion.latitude}
+                      onChange={(e) => setCurrentLocation(prev => ({ ...prev, latitude: Number(e.target.value) }))}
+                      placeholder="e.g. 37.7749"
+                      required
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="longitude" className="text-left">
+                      Longitude
+                    </Label>
+                    <Input
+                      id="longitude"
+                      name="longitude"
+                      type="number"
+                      step="0.000001"
+                      className="col-span-3"
+                      defaultValue={currentLocaltion.longitude}
+                      onChange={(e) => setCurrentLocation(prev => ({ ...prev, longitude: Number(e.target.value) }))}
+                      placeholder="e.g. -122.4194"
+                      required
+                    />
+                  </div>
+                  <iframe src={`https://maps.google.com/maps?q=+${currentLocaltion.latitude}+,+${currentLocaltion.longitude}+&hl=en&z=14&output=embed`} className="w-full" allowFullScreen={false} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="treeType" className="text-left">
+                      Tree Type
+                    </Label>
+                    <div className="col-span-3">
+                      <Select name="treeType" required>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select tree type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {
+                            treeTypes.map((tree: TTreeType) => (
+                              <SelectItem key={tree.typeId} value={tree.typeId.toString()}>{tree.type}</SelectItem>
+                            ))
+                          }
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="plantingDate" className="text-left">
+                      Planting Date
+                    </Label>
+                    <div className="col-span-3">
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={cn("w-full justify-start text-left font-normal", !date && "text-muted-foreground")}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {date ? format(date, "PPP") : "Select date"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0">
+                          <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
+                        </PopoverContent>
+                      </Popover>
+                      <input type="hidden" name="plantingDate" value={date ? format(date, "yyyy-MM-dd") : ""} />
+                    </div>
+                  </div>
 
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="plantingTime" className="text-left">
-                  Planting Time
-                </Label>
-                <div className="col-span-3 flex items-center">
-                  <Clock className="mr-2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="plantingTime"
-                    name="plantingTime"
-                    type="time"
-                    value={time}
-                    onChange={(e) => setTime(e.target.value)}
-                    className="w-full"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="treeImage" className="text-right">
-                  Tree Image
-                </Label>
-                <div className="col-span-3">
-                  <Input
-                    id="treeImage"
-                    name="treeImage"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    required
-                  />
-                  {imagePreview && (
-                    <div className="mt-2">
-                      <Image
-                        src={imagePreview || "/placeholder.svg"}
-                        width={200}
-                        height={200}
-                        alt="Tree preview"
-                        className="max-h-32 rounded-md object-cover"
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="plantingTime" className="text-left">
+                      Planting Time
+                    </Label>
+                    <div className="col-span-3 flex items-center">
+                      <Clock className="mr-2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="plantingTime"
+                        name="plantingTime"
+                        type="time"
+                        value={time}
+                        onChange={(e) => setTime(e.target.value)}
+                        className="w-full"
+                        required
                       />
                     </div>
-                  )}
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="treeImage" className="text-right">
+                      Tree Image
+                    </Label>
+                    <div className="col-span-3">
+                      <Input
+                        id="treeImage"
+                        name="treeImage"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        required
+                      />
+                      {imagePreview && (
+                        <div className="mt-2">
+                          <Image
+                            src={imagePreview || "/placeholder.svg"}
+                            width={200}
+                            height={200}
+                            alt="Tree preview"
+                            className="max-h-32 rounded-md object-cover"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button type="submit">Mint Tree</Button>
-              </DialogClose>
-            </DialogFooter>
-          </form>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button type="submit">Mint Tree</Button>
+                  </DialogClose>
+                </DialogFooter>
+              </form>
 
-        </DialogContent>
-      </Dialog>
+            </DialogContent>
+          </Dialog>
+        ) : (
+          <Button variant="outline" className="ml-2 cursor-pointer" onClick={() => connectWallet()}>🌲 Connect wallet to mint a tree</Button>
+        )
+      }
+
+
     </div>
   );
 }
