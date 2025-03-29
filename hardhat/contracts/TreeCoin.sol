@@ -8,7 +8,10 @@ contract TreeCoin is ERC20, AccessControlEnumerable {
     bytes32 public constant ADMIN = keccak256("ADMIN");
     address private _owner;
 
+    event MintToken(address from, uint256 amount);
+    event BurnToken(address from, uint256 amount);
     event NewTransaction(address sender, address recipient, uint256 amount);
+    
 
     constructor(address owner) ERC20("Etreereum", "ETR") {
         _owner = owner;
@@ -64,12 +67,18 @@ contract TreeCoin is ERC20, AccessControlEnumerable {
         emit NewTransaction(msg.sender, recipient, amount);
     }
 
-    function mint(address account, uint256 amount) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        _mint(account, amount);
+    function getTotalSupply() public view returns (uint256) {
+        return totalSupply();
     }
 
-    function burn(address account, uint256 amount) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    function mint(address account, uint256 amount) public onlyRole(ADMIN) {
+        _mint(account, amount);
+        emit MintToken(account, amount);
+    }
+
+    function burn(address account, uint256 amount) public onlyRole(ADMIN) {
         _burn(account, amount);
+        emit BurnToken(account, amount);
     }
 }
 
