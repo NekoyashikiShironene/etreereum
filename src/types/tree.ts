@@ -6,7 +6,7 @@ export type PlantingTree = {
     longitude: number,
     treeImageUrl: string,
     plantedAt: string,
-    validationStatus: boolean
+    validationStatus: number
 }
 
 export type TTreeType = {
@@ -23,7 +23,7 @@ export type TreeMetadata = {
     longitude: number,
     treeImageUrl: string,
     plantedAt: string,
-    validationStatus: boolean
+    validationStatus: number
 }
 
 export type Tree = {
