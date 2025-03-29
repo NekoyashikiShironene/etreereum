@@ -1,6 +1,6 @@
 import { HumanReadableEvent, TEventData } from "@/types/event";
 
-export function filterMyTransactions(events: TEventData[], currentUserAddress: string): TEventData[] {
+export function filterMyTransactions(events: TEventData[], currentUserAddress: string, role: string): TEventData[] {
     const lowerCurrentUser = currentUserAddress.toLowerCase();
     
     return events.filter(event => {
@@ -15,6 +15,10 @@ export function filterMyTransactions(events: TEventData[], currentUserAddress: s
             case "NewTransaction":
                 return event?.sender?.toLowerCase() === lowerCurrentUser || 
                        event?.recipient?.toLowerCase() === lowerCurrentUser;
+            
+            case "MintTree":
+            case "BurnTree":
+                return (role === "user" && event.from?.toLowerCase() === lowerCurrentUser) || role !== "user";
             default:
                 return false;
         }
@@ -22,7 +26,7 @@ export function filterMyTransactions(events: TEventData[], currentUserAddress: s
 }
 
 
-export function toHumanReadableEvents(events: TEventData[], currentUserAddress: string): HumanReadableEvent[] {
+export function toHumanReadableEvents(events: TEventData[], currentUserAddress: string, role: string): HumanReadableEvent[] {
     const lowerCurrentUser = currentUserAddress.toLowerCase();
 
     return events.map(event => {
@@ -73,6 +77,28 @@ export function toHumanReadableEvents(events: TEventData[], currentUserAddress: 
                 } else {
                     message = `${event?.sender} sent ${event?.amount} tokens to ${event?.recipient}`;
                 }
+                break;
+
+            case "MintToken":
+                color = "green";
+                icon = "💰";
+                if (isUserInvolved(event?.from)) {
+                    message = `You minted ${event?.amount} ETR`;
+                } else {
+                    message = `${event?.from} minted ${event?.amount} ETR`;
+                }
+                
+                break;
+
+            case "BurnToken":
+                color = "red";
+                icon = "🔥";
+                if (isUserInvolved(event?.from)) {
+                    message = `You burned ${event?.amount} ETR`;
+                } else {
+                    message = `${event?.from} burned ${event?.amount} ETR`;
+                }
+                message = "";
                 break;
 
             default:
