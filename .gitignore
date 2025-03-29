@@ -63,3 +63,5 @@ todolist.txt
 
 
 public/uploads/*
+debug*
+settings.json
