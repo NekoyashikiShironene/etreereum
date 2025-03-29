@@ -70,7 +70,7 @@ export async function approveMintTree(formData: FormData) {
       },
 
       data: {
-        validationStatus: true,
+        validationStatus: 1,
         latitude: latitude,
         longitude: longitude
       }
@@ -79,7 +79,29 @@ export async function approveMintTree(formData: FormData) {
 
     return { message: 'Tree minted successfully.', error: false };
   } catch (err: unknown) {
-    return { message: err as string, error: true }
+    return { message: String(err), error: true }
+  }
+}
+
+export async function rejectMintTree(formData: FormData) {
+  
+  const plantingId = formData.get('plantingId') as string;
+
+  try {
+    await prisma.planting.update({
+      where: {
+        treeId: Number(plantingId)
+      },
+
+      data: {
+        validationStatus: 2
+      }
+    })
+
+
+    return { message: 'Tree minted successfully.', error: false };
+  } catch (err: unknown) {
+    return { message: String(err), error: true }
   }
 }
 
