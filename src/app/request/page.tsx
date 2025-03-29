@@ -6,9 +6,7 @@ import { useWallet } from '@/contexts/WalletContext';
 import { PlantingTree } from '@/types/tree';
 
 
-import AdminPendingTable from '@/components/AdminPendingTable';
 import UserPendingTable from '@/components/UserPendingTable';
-import BurnTreeTable from '@/components/BurnTreeTable';
 import WalletButton from '@/components/WalletButton';
 
 export default function Page() {
@@ -52,13 +50,7 @@ export default function Page() {
 
     return (
         <div className='text-center pt-[5rem]'>
-            {
-                role !== "user" ? <AdminPendingTable planting={requests} /> : <UserPendingTable planting={requests} />
-            }
-
-            {
-                role !== "user" && <BurnTreeTable />
-            }
+            <UserPendingTable planting={requests} />
         </div>
     );
 }
