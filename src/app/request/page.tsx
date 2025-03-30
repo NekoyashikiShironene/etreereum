@@ -20,11 +20,7 @@ export default function Page() {
         const fetchRequests = async () => {
             if (!selectedAccount) return;
             try {
-                const endpoint = new URL(`${process.env.NEXT_PUBLIC_URL}/api/trees`);
-                if (role === 'user')
-                    endpoint.searchParams.set('user', selectedAccount ?? '');
-
-                const res = await fetch(endpoint.toString());
+                const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/trees/requests/${selectedAccount}`);
                 if (!res.ok) throw new Error("Failed to fetch requests");
                 const requestData = await res.json();
                 setRequests(requestData.data);

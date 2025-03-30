@@ -1,10 +1,8 @@
 "use client";
 
 import { PlantingTree } from "@/types/tree";
-
 import {
     Dialog,
-    DialogClose,
     DialogContent,
     DialogDescription,
     DialogFooter,
@@ -42,7 +40,7 @@ export default function AdminPendingTable() {
 
     const fetchRequests = async () => {
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/trees`);
+            const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/trees/requests`);
             const requestData = await res.json();
             setRequests(requestData.data);
         }
@@ -238,6 +236,7 @@ export default function AdminPendingTable() {
                                                             name="height"
                                                             type="number"
                                                             className="col-span-3"
+                                                            defaultValue={1}
                                                         />
                                                     </div>
                                                 </div>
