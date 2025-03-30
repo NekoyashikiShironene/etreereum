@@ -47,53 +47,53 @@ export default function TokenBalance() {
       <div className="flex gap-2 mt-4">
         {
           selectedAccount ? (
-<Dialog>
-          <DialogTrigger asChild>
-            <Button variant="outline">↔ Transfer</Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Transfer ETR</DialogTitle>
-              <DialogDescription>
-                Send ETR to another account
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name" className="text-right">
-                  Address
-                </Label>
-                <Input
-                  id="address"
-                  className="col-span-3"
-                  placeholder="0x..."
-                  onChange={(e) => setAddress(e.target.value)}
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="username" className="text-right">
-                  Amount
-                </Label>
-                <Input
-                  id="amount"
-                  defaultValue="5"
-                  className="col-span-3"
-                  onChange={(e) => setAmount(e.target.value)}
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button onClick={() => handleTransfer()} >Transfer</Button>
-              </DialogClose>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline">↔ Transfer</Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Transfer ETR</DialogTitle>
+                  <DialogDescription>
+                    Send ETR to another account
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="name" className="text-right">
+                      Address
+                    </Label>
+                    <Input
+                      id="address"
+                      className="col-span-3"
+                      placeholder="0x..."
+                      onChange={(e) => setAddress(e.target.value)}
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="username" className="text-right">
+                      Amount
+                    </Label>
+                    <Input
+                      id="amount"
+                      defaultValue="5"
+                      className="col-span-3"
+                      onChange={(e) => setAmount(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button onClick={() => handleTransfer()} >Transfer</Button>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           ) : (
             <Button variant="outline" onClick={() => connectWallet()}>↔ Connect wallet to transfer</Button>
           )
         }
-        
+
 
       </div>
     </div>
