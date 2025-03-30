@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useContract } from '@/contexts/ContractContext';
 import { useWallet } from '@/contexts/WalletContext';
 import { useRouter } from 'next/navigation';
@@ -12,14 +12,18 @@ import WalletButton from '@/components/WalletButton';
 import { Layout } from '@/components/layout/AdminLayout';
 import AdminTokenSupply from '@/components/AdminTokenSupply';
 import AdminTable from '@/components/AdminsTable';
+import TreeTable from '@/components/TreeTable';
 
 export default function Page() {
     const router = useRouter();
     const { nftreeContract } = useContract();
     const { selectedAccount } = useWallet();
+
+    useEffect(() => {
+        if (nftreeContract.role === "user")
+            router.push("/");
+    }, [nftreeContract.role, router]);
     
-    if (nftreeContract.role === "user")
-        router.push("/");
 
     const [activeComponent, setActiveComponent] = useState("dashboard");
 
@@ -33,6 +37,8 @@ export default function Page() {
                 return <BurnTreeTable />
             case "role":
                 return <AdminTable />
+            case "tree":
+                return <TreeTable />
             default:
                 return <AdminPendingTable />
         }
