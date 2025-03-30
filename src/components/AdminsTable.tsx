@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useContract } from "@/contexts/ContractContext";
 import {
     Table,
@@ -16,7 +16,7 @@ import { toast } from "sonner";
 
 export default function AdminTable() {
     const { etreereumContract, nftreeContract } = useContract();
-    const [address, setAddress] = useState("");
+    const [address, setAddress] = useState<string>("");
 
     const handleAddAdmin = async () => {
         if (!etreereumContract || !address) return;
