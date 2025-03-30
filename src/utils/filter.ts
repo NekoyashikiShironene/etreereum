@@ -5,8 +5,10 @@ export function filterMyTransactions(events: TEventData[], currentUserAddress: s
 
     return events.filter(event => {
         switch (event?.type) {
-            case "GrantAdmin":
-            case "RevokeAdmin":
+            case "GrantETRAdmin":
+            case "RevokeETRAdmin":
+            case "GrantTreeAdmin":
+            case "RevokeTreeAdmin":
                 return event?.account?.toLowerCase() === lowerCurrentUser ||
                     event?.sender?.toLowerCase() === lowerCurrentUser;
             case "MintTree":
@@ -15,7 +17,8 @@ export function filterMyTransactions(events: TEventData[], currentUserAddress: s
                     event?.sender?.toLowerCase() === lowerCurrentUser;
             case "MintToken":
             case "BurnToken":
-                return event.from?.toLowerCase() === lowerCurrentUser;
+                return event.from?.toLowerCase() === lowerCurrentUser ||
+                    event?.sender?.toLowerCase() === lowerCurrentUser;
             case "ChangeOwner":
                 return event?.oldOwner?.toLowerCase() === lowerCurrentUser ||
                     event?.newOwner?.toLowerCase() === lowerCurrentUser;
@@ -41,28 +44,53 @@ export function toHumanReadableEvents(events: TEventData[], currentUserAddress: 
         const isUserInvolved = (address: string | undefined) => address?.toLowerCase() === lowerCurrentUser;
 
         switch (event?.type) {
-            case "GrantAdmin":
+            case "GrantETRAdmin":
                 color = 'green';
                 icon = '🛡️';
                 if (isUserInvolved(event?.account)) {
-                    message = `You have been granted admin privileges by ${event?.sender}`;
+                    message = `You have been granted admin privileges for ETR by ${event?.sender}`;
                 } else if (isUserInvolved(event?.sender)) {
-                    message = `You granted admin privileges to ${event?.account}`;
+                    message = `You granted admin privileges for ETR to ${event?.account}`;
                 } else {
-                    message = `${event?.sender} granted admin privileges to ${event?.account}`;
+                    message = `${event?.sender} granted admin privileges for ETR to ${event?.account}`;
                 }
                 break;
 
 
-            case "RevokeAdmin":
+            case "RevokeETRAdmin":
                 color = 'red';
                 icon = '⚠️';
                 if (isUserInvolved(event?.account))
-                    message = `Your admin privileges have been revoked by ${event?.sender}`;
+                    message = `Your admin privileges for ETR have been revoked by ${event?.sender}`;
                 else if (isUserInvolved(event?.sender))
-                    message = `You revoked admin privileges from ${event?.account}`;
+                    message = `You revoked admin privileges for ETR from ${event?.account}`;
                 else
-                    message = `${event?.sender} revoked admin privileges from ${event?.account}`;
+                    message = `${event?.sender} revoked admin privileges for ETR from ${event?.account}`;
+
+                break;
+
+            case "GrantTreeAdmin":
+                color = 'green';
+                icon = '🛡️';
+                if (isUserInvolved(event?.account)) {
+                    message = `You have been granted admin privileges for NFTree by ${event?.sender}`;
+                } else if (isUserInvolved(event?.sender)) {
+                    message = `You granted admin privileges for NFTree to ${event?.account}`;
+                } else {
+                    message = `${event?.sender} granted admin privileges for NFTree to ${event?.account}`;
+                }
+                break;
+
+
+            case "RevokeTreeAdmin":
+                color = 'red';
+                icon = '⚠️';
+                if (isUserInvolved(event?.account))
+                    message = `Your admin privileges for NFTree have been revoked by ${event?.sender}`;
+                else if (isUserInvolved(event?.sender))
+                    message = `You revoked admin privileges for NFTree from ${event?.account}`;
+                else
+                    message = `${event?.sender} revoked admin privileges for NFTree from ${event?.account}`;
 
                 break;
 

@@ -76,14 +76,26 @@ export function ContractProvider({ children }: { children: ReactNode }) {
         ]);
 
         const allEvents: TEventData[] = [
-            ...[...(grantAdminEtrEvents ?? []), ...(grantAdminNftEvents ?? [])].map(e => ({
-                type: "GrantAdmin",
+            ...(grantAdminEtrEvents ?? []).map(e => ({
+                type: "GrantETRAdmin",
                 sender: e.args.sender,
                 account: e.args.account,
                 blockNumber: e.blockNumber
             })),
-            ...[...(revokeAdminEtrEvents ?? []), ...(revokeAdminNftEvents ?? [])].map(e => ({
-                type: "RevokeAdmin",
+            ...(grantAdminNftEvents ?? []).map(e => ({
+                type: "GrantTreeAdmin",
+                sender: e.args.sender,
+                account: e.args.account,
+                blockNumber: e.blockNumber
+            })),
+            ...(revokeAdminEtrEvents ?? []).map(e => ({
+                type: "RevokeETRAdmin",
+                sender: e.args.sender,
+                account: e.args.account,
+                blockNumber: e.blockNumber
+            })),
+            ...(revokeAdminNftEvents ?? []).map(e => ({
+                type: "RevokeTreeAdmin",
                 sender: e.args.sender,
                 account: e.args.account,
                 blockNumber: e.blockNumber
@@ -91,6 +103,7 @@ export function ContractProvider({ children }: { children: ReactNode }) {
             ...(mintTreeEvents ?? []).map(e => ({
                 type: "MintTree",
                 owner: e.args.owner,
+                sender: e.args.sender,
                 plantedAt: Number(e.args.plantedAt),
                 metadataURI: e.args.metadataURI,
                 latitude: Number(e.args.latitude),
@@ -100,6 +113,7 @@ export function ContractProvider({ children }: { children: ReactNode }) {
             ...(burnTreeEvents ?? []).map(e => ({
                 type: "BurnTree",
                 owner: e.args.owner,
+                sender: e.args.sender,
                 tokenId: Number(e.args.tokenId),
                 latitude: Number(e.args.latitude),
                 longitude: Number(e.args.longitude),
@@ -114,12 +128,14 @@ export function ContractProvider({ children }: { children: ReactNode }) {
             ...(mintTokenEvents ?? []).map(e => ({
                 type: "MintToken",
                 from: e.args.from,
+                sender: e.args.sender,
                 amount: ethers.formatUnits(e.args.amount, 18),
                 blockNumber: e.blockNumber
             })),
             ...(burnTokenEvents ?? []).map(e => ({
                 type: "BurnToken",
                 from: e.args.from,
+                sender: e.args.sender,
                 amount: ethers.formatUnits(e.args.amount, 18),
                 blockNumber: e.blockNumber
             })),
