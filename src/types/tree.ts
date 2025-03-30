@@ -4,6 +4,7 @@ export type PlantingTree = {
     ownerAddress: string,
     latitude: number,
     longitude: number,
+    height: number,
     treeImageUrl: string,
     plantedAt: string,
     validationStatus: number
@@ -21,6 +22,7 @@ export type TreeMetadata = {
     ownerAddress: string,
     latitude: number,
     longitude: number,
+    height: number,
     treeImageUrl: string,
     plantedAt: string,
     validationStatus: number
