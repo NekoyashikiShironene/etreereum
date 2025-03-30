@@ -1,8 +1,4 @@
-import Image from "next/image"
-import Link from "next/link"
-import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-
 import NFTGallery from "@/components/NFTGallery"
 
 export default function NFTGalleryPage() {
