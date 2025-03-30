@@ -160,20 +160,18 @@ export default function NFTGallery() {
                   Planted: {new Date(tree.plantedAt * 1000).toLocaleDateString()}
                 </p>
                 <Button variant="outline" onClick={() => openTransferDialog(tree)}>
-                  🔄 Transfer Ownership
+                  Detail
                 </Button>
               </CardContent>
             </Card>
           </div>
         ))}
       </div>
-
-      {/* Transfer Ownership Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Transfer Tree Ownership</DialogTitle>
-            <DialogDescription>Enter the new owner&apos;s address to transfer this tree NFT.</DialogDescription>
+            <DialogTitle>Tree Detail</DialogTitle>
+            <DialogDescription>Metadata of NFTree</DialogDescription>
           </DialogHeader>
           {selectedTree && (
             <form onSubmit={handleSubmit}>
@@ -243,7 +241,7 @@ export default function NFTGallery() {
                   />
                 </div>
                 <iframe
-                  src={`https://maps.google.com/maps?q=${selectedTree.gpsLocation.latitude},${selectedTree.gpsLocation.longitude}&hl=en&z=14&output=embed`}
+                  src={`https://maps.google.com/maps?q=+${selectedTree.gpsLocation.latitude}+,+${selectedTree.gpsLocation.longitude}+&hl=en&z=20&t=k&output=embed`}
                   className="w-full h-48"
                   allowFullScreen={false}
                   loading="lazy"
@@ -259,6 +257,19 @@ export default function NFTGallery() {
                     type="number"
                     className="col-span-3"
                     defaultValue={selectedTree.metadata.typeId}
+                    readOnly
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="treeId" className="text-left">
+                    Height (cm)
+                  </Label>
+                  <Input
+                    id="height"
+                    name="height"
+                    type="number"
+                    className="col-span-3"
+                    defaultValue={selectedTree.metadata.height}
                     readOnly
                   />
                 </div>
