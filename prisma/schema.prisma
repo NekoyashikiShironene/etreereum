@@ -13,11 +13,11 @@ model Planting {
   ownerAddress     String?   @db.VarChar(50)
   latitude         Decimal?  @db.Decimal(10, 8)
   longitude        Decimal?  @db.Decimal(11, 8)
+  height           Int?
   treeImageUrl     String    @db.VarChar(255)
   plantedAt        DateTime? @default(now()) @db.Timestamp(0)
   validationStatus Int?      @default(0)
   Tree             Tree?     @relation(fields: [typeId], references: [typeId], onDelete: NoAction, onUpdate: NoAction, map: "Planting_ibfk_1")
-  User             User?     @relation(fields: [ownerAddress], references: [walletAddress], onDelete: NoAction, onUpdate: NoAction, map: "Planting_ibfk_2")
 
   @@index([ownerAddress], map: "ownerAddress")
   @@index([typeId], map: "typeId")
@@ -28,14 +28,6 @@ model Tree {
   type     String?    @db.VarChar(255)
   value    Float?     @db.Float
   Planting Planting[]
-}
-
-model User {
-  walletAddress String       @id @db.VarChar(50)
-  name          String?      @db.VarChar(255)
-  email         String?      @db.VarChar(255)
-  Planting      Planting[]
-  Redemption    Redemption[]
 }
 
 model Item {
@@ -53,7 +45,6 @@ model Redemption {
   itemId        Int
   redeemedAt    DateTime? @default(now()) @db.Timestamp(0)
   Item          Item      @relation(fields: [itemId], references: [itemId], onDelete: NoAction, onUpdate: NoAction, map: "Redemption_ibfk_1")
-  User          User      @relation(fields: [walletAddress], references: [walletAddress], onUpdate: Restrict, map: "Redemption_ibfk_2")
 
   @@index([itemId], map: "itemId")
   @@index([walletAddress], map: "walletAddress")
