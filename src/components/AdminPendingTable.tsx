@@ -197,7 +197,7 @@ export default function AdminPendingTable() {
                                                         readOnly
                                                     />
                                                 </div>
-                                                <iframe src={`https://maps.google.com/maps?q=+${req.latitude}+,+${req.longitude}+&hl=en&z=14&output=embed`} className="w-full" allowFullScreen={false} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
+                                                <iframe src={`https://maps.google.com/maps?q=+${req.latitude}+,+${req.longitude}+&hl=en&z=20&t=k&output=embed`} className="w-full h-[16rem]" allowFullScreen={false} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
                                                 <div className="grid grid-cols-4 items-center gap-4">
                                                     <Label htmlFor="treeType" className="text-left">
                                                         Planting ID
@@ -225,6 +225,19 @@ export default function AdminPendingTable() {
                                                             className="col-span-3"
                                                             defaultValue={req.typeId}
                                                             readOnly
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="grid grid-cols-4 items-center gap-4">
+                                                    <Label htmlFor="treeHeight" className="text-left">
+                                                        Height
+                                                    </Label>
+                                                    <div className="col-span-3">
+                                                        <Input
+                                                            id="height"
+                                                            name="height"
+                                                            type="number"
+                                                            className="col-span-3"
                                                         />
                                                     </div>
                                                 </div>

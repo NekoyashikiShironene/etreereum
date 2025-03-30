@@ -29,26 +29,24 @@ import type { TTreeType } from "@/types/tree";
 
 import { requestMintTree } from "@/actions/nftree";
 import Link from "next/link";
+import { useLocation } from "@/hooks/location";
 
 
 export default function NFTCollection() {
   const { selectedAccount, connectWallet } = useWallet();
   const { nftreeContract } = useContract();
+  const { location, setLocation } = useLocation();
   const { balance } = nftreeContract;
 
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [time, setTime] = useState<string>("12:00");
-  const [currentLocaltion, setCurrentLocation] = useState({
-    latitude: 13,
-    longitude: 100
-  });
 
   const [treeTypes, setTreeTypes] = useState<TTreeType[]>([]);
 
   useEffect(() => {
     const fetchTreeType = async () => {
-      const response = await fetch("/api/trees/types");
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/trees/types`);
       const json = await response.json();
       setTreeTypes(json.data);
     }
@@ -93,23 +91,6 @@ export default function NFTCollection() {
     else
       toast.success("Succeed!");
   }
-
-
-  useEffect(() => {
-    function success(position: { coords: { latitude: number; longitude: number; }; }) {
-      setCurrentLocation({
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude
-      })
-    }
-
-    function error() { }
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(success, error);
-    } else {
-      console.log("Geolocation is not supported by this browser.");
-    }
-  }, [])
 
 
 
@@ -160,8 +141,8 @@ export default function NFTCollection() {
                       type="number"
                       step="0.000001"
                       className="col-span-3"
-                      defaultValue={currentLocaltion.latitude}
-                      onChange={(e) => setCurrentLocation(prev => ({ ...prev, latitude: Number(e.target.value) }))}
+                      defaultValue={location.latitude}
+                      onChange={(e) => setLocation(prev => ({ ...prev, latitude: Number(e.target.value) }))}
                       placeholder="e.g. 37.7749"
                       required
                     />
@@ -176,13 +157,13 @@ export default function NFTCollection() {
                       type="number"
                       step="0.000001"
                       className="col-span-3"
-                      defaultValue={currentLocaltion.longitude}
-                      onChange={(e) => setCurrentLocation(prev => ({ ...prev, longitude: Number(e.target.value) }))}
+                      defaultValue={location.longitude}
+                      onChange={(e) => setLocation(prev => ({ ...prev, longitude: Number(e.target.value) }))}
                       placeholder="e.g. -122.4194"
                       required
                     />
                   </div>
-                  <iframe src={`https://maps.google.com/maps?q=+${currentLocaltion.latitude}+,+${currentLocaltion.longitude}+&hl=en&z=14&output=embed`} className="w-full" allowFullScreen={false} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
+                  <iframe src={`https://maps.google.com/maps?q=+${location.latitude}+,+${location.longitude}+&hl=en&z=20&t=k&output=embed`} className="w-full h-[16rem]" allowFullScreen={false} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
                   <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="treeType" className="text-left">
                       Tree Type
