@@ -10,7 +10,8 @@ export type TEventData = {
     newOwner?: string,
     sender?: string,
     recipient?: string,
-    from: string,
+    from?: string,
+    account?: string,
     amount?: string,
     blockNumber: number,
 };
