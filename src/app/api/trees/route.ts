@@ -1,27 +1,15 @@
-import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/db/prisma";
+import { NextResponse } from "next/server";
 
-export async function GET(req: NextRequest) {
-    const user = req.nextUrl.searchParams.get("user");
+export async function GET() {
+    const treesData = await prisma.planting.findMany({
+        where: {
+            validationStatus: 1
+        },
+        include: {
+            Tree: true
+        }
+    });
 
-    let treeData;
-    if (!user)
-        treeData = await prisma.planting.findMany({
-            where: {
-                validationStatus: 0
-            }  
-        });
-    else
-        treeData = await prisma.planting.findMany({
-            where: {
-                ownerAddress: user,
-            },
-            orderBy: {
-                treeId: 'desc'
-            }
-        });
-
-
-    return NextResponse.json({ data: treeData })
+    return NextResponse.json({ data: treesData });
 }
-
