@@ -34,7 +34,7 @@ export function ContractProvider({ children }: { children: ReactNode }) {
         role: "user",
         balance: "-",
         totalSupply: "-",
-        admin: []
+        admins: []
     });
 
     const [nftreeContract, setNFTreeContract] = useState<TNFTreeContract>({
@@ -45,13 +45,17 @@ export function ContractProvider({ children }: { children: ReactNode }) {
         latitude: 0,
         longitude: 0,
         metadataURI: "",
-        admin: []
+        admins: []
     });
 
     const fetchEvent = async () => {
         if (!etreereumContract.instance || !nftreeContract.instance) return;
 
         const [
+            grantAdminEtrEvents,
+            revokeAdminEtrEvents,
+            grantAdminNftEvents,
+            revokeAdminNftEvents,
             mintTreeEvents,
             burnTreeEvents,
             ownerEvents,
@@ -59,6 +63,10 @@ export function ContractProvider({ children }: { children: ReactNode }) {
             burnTokenEvents,
             transactionEvents,
         ] = await Promise.all([
+            etreereumContract.instance.queryFilter("GrantAdmin", 0, "latest"),
+            etreereumContract.instance.queryFilter("RevokeAdmin", 0, "latest"),
+            nftreeContract.instance.queryFilter("GrantAdmin", 0, "latest"),
+            nftreeContract.instance.queryFilter("RevokeAdmin", 0, "latest"),
             nftreeContract.instance.queryFilter("MintTree", 0, "latest"),
             nftreeContract.instance.queryFilter("BurnTree", 0, "latest"),
             nftreeContract.instance.queryFilter("ChangeOwner", 0, "latest"),
@@ -68,6 +76,18 @@ export function ContractProvider({ children }: { children: ReactNode }) {
         ]);
 
         const allEvents: TEventData[] = [
+            ...[...(grantAdminEtrEvents ?? []), ...(grantAdminNftEvents ?? [])].map(e => ({
+                type: "GrantAdmin",
+                sender: e.args.sender,
+                account: e.args.account,
+                blockNumber: e.blockNumber
+            })),
+            ...[...(revokeAdminEtrEvents ?? []), ...(revokeAdminNftEvents ?? [])].map(e => ({
+                type: "RevokeAdmin",
+                sender: e.args.sender,
+                account: e.args.account,
+                blockNumber: e.blockNumber
+            })),
             ...(mintTreeEvents ?? []).map(e => ({
                 type: "MintTree",
                 owner: e.args.owner,
@@ -117,6 +137,34 @@ export function ContractProvider({ children }: { children: ReactNode }) {
         console.log("Fetched events:", sortedEvents);
     };
 
+    const fetchContract = async () => {
+        if (!nftreeContract.instance || !etreereumContract.instance) return;
+
+        const coinRole = await etreereumContract.instance.getRoleName();
+        const nftRole = await nftreeContract.instance.getRoleName();
+
+        let etrAdmins: string[] = [];
+        let nftAdmins: string[] = [];
+
+        if (coinRole !== "user")
+            etrAdmins = await etreereumContract.instance.getAdmins();
+
+        if (nftRole !== "user")
+            nftAdmins = await nftreeContract.instance.getAdmins();
+
+        setEtreereumContract(prev => ({
+            ...prev,
+            role: coinRole,
+            admins: etrAdmins
+        }));
+
+        setNFTreeContract(prev => ({
+            ...prev,
+            role: nftRole,
+            admins: nftAdmins
+        }));
+    }
+
     useEffect(() => {
         const initContracts = async () => {
             if (!window.ethereum) {
@@ -134,9 +182,9 @@ export function ContractProvider({ children }: { children: ReactNode }) {
                 setSigner(signer);
 
                 const etrContract = new ethers.Contract(TREE_COIN_ADDRESS, treeCoinContract.abi, signer);
-                const coinRole = await etrContract.getRoleName();
-
                 const nftContract = new ethers.Contract(TREE_ADDRESS, treeContract.abi, signer);
+
+                const coinRole = await etrContract.getRoleName();
                 const nftRole = await nftContract.getRoleName();
 
                 let etrAdmins: string[] = [];
@@ -147,6 +195,7 @@ export function ContractProvider({ children }: { children: ReactNode }) {
 
                 if (nftRole !== "user")
                     nftAdmins = await nftContract.getAdmins();
+
 
                 setEtreereumContract(prev => ({
                     ...prev,
@@ -159,9 +208,8 @@ export function ContractProvider({ children }: { children: ReactNode }) {
                     ...prev,
                     instance: nftContract,
                     role: nftRole,
-                    admin: nftAdmins
+                    admins: nftAdmins
                 }));
-
 
             } catch (error) {
                 console.error("Error initializing contracts:", error);
@@ -195,6 +243,8 @@ export function ContractProvider({ children }: { children: ReactNode }) {
 
         fetchBalance();
 
+        etreereumContract.instance.on("GrantAdmin", () => fetchContract().then(() => fetchEvent()));
+        etreereumContract.instance.on("RevokeAdmin", () => fetchContract().then(() => fetchEvent()));
         etreereumContract.instance.on("MintToken", () => fetchBalance().then(() => fetchEvent()));
         etreereumContract.instance.on("BurnToken", () => fetchBalance().then(() => fetchEvent()));
         etreereumContract.instance.on("NewTransaction", () => fetchBalance().then(() => fetchEvent()));
@@ -203,7 +253,9 @@ export function ContractProvider({ children }: { children: ReactNode }) {
         return () => {
             etreereumContract.instance?.removeAllListeners("MintToken")
                 .then(() => etreereumContract.instance?.removeAllListeners("BurnToken"))
-                .then(() => etreereumContract.instance?.removeAllListeners("NewTransaction"));
+                .then(() => etreereumContract.instance?.removeAllListeners("NewTransaction"))
+                .then(() => etreereumContract.instance?.removeAllListeners("GrantAdmin"))
+                .then(() => etreereumContract.instance?.removeAllListeners("RevokeAdmin"));
         };
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -227,6 +279,8 @@ export function ContractProvider({ children }: { children: ReactNode }) {
 
         fetchBalance();
 
+        nftreeContract.instance.on("GrantAdmin", () => fetchContract().then(() => fetchEvent()));
+        nftreeContract.instance.on("RevokeAdmin", () => fetchContract().then(() => fetchEvent()));
         nftreeContract.instance.on("MintTree", () => fetchBalance().then(() => fetchEvent()));
         nftreeContract.instance.on("BurnTree", () => fetchBalance().then(() => fetchEvent()));
         nftreeContract.instance.on("ChangeOwner", () => fetchBalance().then(() => fetchEvent()));
@@ -235,6 +289,8 @@ export function ContractProvider({ children }: { children: ReactNode }) {
             nftreeContract.instance?.removeAllListeners("MintTree")
                 .then(() => nftreeContract.instance?.removeAllListeners("BurnTree"))
                 .then(() => nftreeContract.instance?.removeAllListeners("ChangeOwner"))
+                .then(() => nftreeContract.instance?.removeAllListeners("GrantAdmin"))
+                .then(() => nftreeContract.instance?.removeAllListeners("RevokeAdmin"));
         };
 
 
