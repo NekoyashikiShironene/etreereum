@@ -4,7 +4,7 @@ export type TContract = {
     instance: Contract | null,
     role: string,
     balance: string,
-    admin: string[]
+    admins: string[]
 }
 
 export type TEtreereumContract = TContract & {  
