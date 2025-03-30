@@ -13,6 +13,7 @@ export function Sidebar({ activeComponent, setActiveComponent }: SidebarProps) {
     { id: "etreereum", label: "Etreereum", icon: Coins },
     { id: "nftree", label: "NFTree", icon: Trees },
     { id: "role", label: "Role", icon: User },
+    { id: "tree", label: "Tree growth", icon: Trees },
   ]
 
   return (
