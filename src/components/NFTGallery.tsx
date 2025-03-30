@@ -40,7 +40,6 @@ export default function NFTGallery() {
       try {
         setIsLoading(true)
         const userNFTGallery = await nftreeContract.instance?.getTrees(selectedAccount);
-        console.log(userNFTGallery)
 
         const fetchTree = async (tree: Tree) => {
           const response = await fetch(tree.metadataURI);
@@ -117,7 +116,7 @@ export default function NFTGallery() {
     const tokenId = Number(formData.get("tokenId"));
 
     try {
-      const tx = await nftreeContract.instance.changeTreeOwner(tokenId, newOwnerAddress);
+      await nftreeContract.instance.changeTreeOwner(tokenId, newOwnerAddress);
       const result = await changeTreeOwner(formData);
 
       if (result.error)
@@ -130,7 +129,6 @@ export default function NFTGallery() {
     setIsDialogOpen(false);
     toast.success("Transfered successful!");
     
-
   }
 
   const openTransferDialog = (tree: Tree) => {
