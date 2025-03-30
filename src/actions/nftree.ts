@@ -12,24 +12,11 @@ export async function requestMintTree(formData: FormData) {
   const plantedAtTimestamp = formData.get('plantedAtTimestamp') as string;
   const treeImage = formData.get('treeImage') as File;
 
-
   if (!accountAddress || isNaN(latitude) || isNaN(longitude) || !treeType || !plantedAt || !treeImage) {
     return { message: 'All fields are required.' };
   }
 
   try {
-    await prisma.user.upsert({
-      where: {
-        walletAddress: accountAddress
-      },
-      update: {
-        walletAddress: accountAddress
-      },
-      create: {
-        walletAddress: accountAddress
-      }
-    });
-
     const file_name = `${plantedAtTimestamp}-${accountAddress}`;
 
     await prisma.planting.create({
@@ -57,7 +44,7 @@ export async function approveMintTree(formData: FormData) {
   const latitude = parseFloat(formData.get('latitude') as string);
   const longitude = parseFloat(formData.get('longitude') as string);
   const plantingId = formData.get('plantingId') as string;
-
+  const height = formData.get('height') as string;
 
   if (isNaN(latitude) || isNaN(longitude)) {
     return { message: 'All fields are required.' };
@@ -72,7 +59,8 @@ export async function approveMintTree(formData: FormData) {
       data: {
         validationStatus: 1,
         latitude: latitude,
-        longitude: longitude
+        longitude: longitude,
+        height: Number(height)
       }
     })
 
