@@ -179,7 +179,7 @@ export default function BurnTreeTable() {
                                                     readOnly
                                                 />
                                             </div>
-                                            <iframe src={`https://maps.google.com/maps?q=+${tree.metadata.latitude}+,+${tree.metadata.longitude}+&hl=en&z=14&output=embed`} className="w-full" allowFullScreen={false} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
+                                            <iframe src={`https://maps.google.com/maps?q=+${tree.metadata.latitude}+,+${tree.metadata.longitude}+&hl=en&z=20&t=k&output=embed`} className="w-full h-[16rem]" allowFullScreen={false} loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
                                             <div className="grid grid-cols-4 items-center gap-4">
                                                 <Label htmlFor="treeType" className="text-left">
                                                     Planting ID
