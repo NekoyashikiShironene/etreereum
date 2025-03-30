@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useContract } from '@/contexts/ContractContext';
 import { useWallet } from '@/contexts/WalletContext';
 import { useRouter } from 'next/navigation';
-import { PlantingTree } from '@/types/tree';
 
 
 import AdminPendingTable from '@/components/AdminPendingTable';
@@ -15,12 +14,12 @@ import AdminTokenSupply from '@/components/AdminTokenSupply';
 import AdminTable from '@/components/AdminsTable';
 
 export default function Page() {
+    const router = useRouter();
     const { nftreeContract } = useContract();
     const { selectedAccount } = useWallet();
-    const router = useRouter();
-
+    
     if (nftreeContract.role === "user")
-        router.replace("/");
+        router.push("/");
 
     const [activeComponent, setActiveComponent] = useState("dashboard");
 
