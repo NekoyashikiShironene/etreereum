@@ -46,6 +46,7 @@ export default function BurnTreeTable() {
                 const userNFTGallery = await nftreeContract.instance?.getAllTrees();
 
                 const fetchTree = async (tree: Tree) => {
+                    console.log(tree.metadataURI);
                     const response = await fetch(tree.metadataURI);
                     let jsonData;
                     try {
@@ -112,7 +113,7 @@ export default function BurnTreeTable() {
                     <TableRow key={index}>
                         <TableCell className="font-medium text-left">{tree.tokenId}</TableCell>
                         <TableCell className='text-left'>{tree.metadata?.treeId}</TableCell>
-                        <TableCell className='text-left'>{typeof tree.metadata.ownerAddress === "string" ? tree.metadata.ownerAddress : "Invalid Address"}</TableCell>
+                        <TableCell className='text-left'>{typeof tree.metadata?.ownerAddress === "string" ? tree.metadata?.ownerAddress : "Invalid Address"}</TableCell>
                         <TableCell className='text-left'>Latitude {tree.gpsLocation.latitude}, Longitude {tree.gpsLocation.longitude}</TableCell>
                         <TableCell className='text-left'>
                             <Dialog>
@@ -146,7 +147,7 @@ export default function BurnTreeTable() {
                                                     id="accountAddress"
                                                     name="accountAddress"
                                                     className="col-span-3"
-                                                    defaultValue={tree.metadata.ownerAddress}
+                                                    defaultValue={tree.metadata?.ownerAddress}
                                                     readOnly
                                                 />
                                             </div>
