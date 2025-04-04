@@ -35,8 +35,7 @@ export default function AdminPendingTable() {
     const { selectedAccount } = useWallet();
     const { etreereumContract, nftreeContract } = useContract();
     const [requests, setRequests] = useState<PlantingTree[]>([]);
-
-    const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+    const [isDialogOpen, setIsDialogOpen] = useState<number>(-1);
 
     const fetchRequests = async () => {
         try {
@@ -118,7 +117,7 @@ export default function AdminPendingTable() {
                 return toast.error("NFTree contract error", { description: result.message });
             toast.success("Rejected successfully!");
         }
-        setIsDialogOpen(false);
+        setIsDialogOpen(-1);
     }
 
     return (
@@ -144,7 +143,7 @@ export default function AdminPendingTable() {
                             <TableCell className='text-left'>{typeof req.ownerAddress === "string" ? req.ownerAddress : "Invalid Address"}</TableCell>
                             <TableCell className='text-left'>Latitude {req.latitude}, Longitude {req.longitude}</TableCell>
                             <TableCell className='text-left'>
-                                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                                <Dialog open={isDialogOpen === index} onOpenChange={() => setIsDialogOpen(prev => prev === -1 ? index : -1)}>
                                     <DialogTrigger asChild>
                                         <Button variant="outline">🌲 Mint Tree</Button>
                                     </DialogTrigger>
